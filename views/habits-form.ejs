@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= action === 'create' ? 'Nuevo Hábito' : 'Editar Hábito' %> | Apolo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a2d9d6bd3c.js" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --color-dark-bg: #0a0e12;
+            --color-dark-secondary: #12181f;
+            --color-gold: #b8996e;
+            --color-gold-light: #c9a97a;
+            --color-gold-dim: #8a7252;
+            --color-light-text: #b8bcc4;
+            --color-gray: #6b7280;
+            --color-gray-light: #8b92a0;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #000000;
+            color: var(--color-light-text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .page-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(184, 153, 110, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(184, 153, 110, 0.05) 0%, transparent 40%),
+                linear-gradient(135deg, rgba(10, 14, 18, 0.98), rgba(18, 24, 31, 0.95));
+            padding: 30px 50px;
+        }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            padding: 25px 30px;
+            background: rgba(18, 24, 31, 0.6);
+            border: 1px solid var(--color-gold-dim);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            animation: slideDown 0.6s ease;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            background: rgba(184, 153, 110, 0.1);
+            border: 1px solid var(--color-gold-dim);
+            border-radius: 12px;
+            color: var(--color-gold-light);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background: rgba(184, 153, 110, 0.25);
+            border-color: var(--color-gold);
+            transform: translateX(-5px);
+        }
+        
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--color-gold);
+            font-weight: 600;
+        }
+        
+        .form-card {
+            background: rgba(18, 24, 31, 0.7);
+            border: 1px solid var(--color-gold-dim);
+            border-radius: 20px;
+            padding: 35px;
+            animation: fadeIn 0.6s ease 0.2s both;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--color-gold);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .form-title i { font-size: 1.1rem; }
+        
+        .form-subtitle {
+            color: var(--color-gray-light);
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group.full-width { grid-column: 1 / -1; }
+        
+        .form-group label {
+            font-size: 0.85rem;
+            color: var(--color-gray-light);
+            font-weight: 500;
+            letter-spacing: 0.03em;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(184, 153, 110, 0.3);
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: var(--color-light-text);
+            font-size: 0.95rem;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-gold);
+            background: rgba(184, 153, 110, 0.08);
+            box-shadow: 0 0 20px rgba(184, 153, 110, 0.15);
+        }
+        
+        .form-group input::placeholder { color: var(--color-gray); }
+        
+        .form-group textarea { 
+            resize: vertical; 
+            min-height: 100px; 
+        }
+        
+        .form-group small {
+            font-size: 0.75rem;
+            color: var(--color-gray);
+            margin-top: 2px;
+        }
+        
+        .btn-group {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-gold), var(--color-gold-light));
+            border: none;
+            color: #0a0e12;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(184, 153, 110, 0.4);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--color-gray);
+            color: var(--color-gray-light);
+        }
+        
+        .btn-outline:hover {
+            border-color: var(--color-gold);
+            color: var(--color-gold);
+            background: rgba(184, 153, 110, 0.1);
+        }
+        
+        @media (max-width: 600px) {
+            .page-wrapper { padding: 20px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .page-header { flex-direction: column; gap: 15px; text-align: center; }
+            .header-left { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <header class="page-header">
+            <div class="header-left">
+                <a href="/habits" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+                <h1 class="page-title">
+                    <i class="fas fa-plus-circle"></i> <%= action === 'create' ? 'Nuevo' : 'Editar' %> Hábito
+                </h1>
+            </div>
+        </header>
+        
+        <div class="form-card">
+            <h2 class="form-title"><i class="fas fa-leaf"></i> Define tu nuevo hábito</h2>
+            <p class="form-subtitle">Añade un hábito saludable que quieras incorporar a tu rutina diaria.</p>
+            
+            <form action="/habits/create" method="POST" class="form-grid">
+                <div class="form-group full-width">
+                    <label for="nombre">Nombre del hábito *</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ej: Meditar 15 minutos" required />
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="descripcion">Descripción</label>
+                    <textarea id="descripcion" name="descripcion" rows="3" placeholder="¿En qué consiste este hábito?"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="categoria">Categoría</label>
+                    <select id="categoria" name="categoria">
+                        <option value="Salud">Salud</option>
+                        <option value="Ejercicio">Ejercicio</option>
+                        <option value="Nutrición">Nutrición</option>
+                        <option value="Descanso">Descanso</option>
+                        <option value="Productividad">Productividad</option>
+                        <option value="Bienestar">Bienestar</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="frecuencia">Frecuencia</label>
+                    <select id="frecuencia" name="frecuencia">
+                        <option value="Diario">Diario</option>
+                        <option value="Semanal">Semanal</option>
+                        <option value="3 veces/semana">3 veces/semana</option>
+                        <option value="5 veces/semana">5 veces/semana</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="icono">Icono (Font Awesome)</label>
+                    <input type="text" id="icono" name="icono" placeholder="fa-star" value="fa-star" />
+                    <small>Usa nombres de iconos de Font Awesome</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="color_hex">Color</label>
+                    <input type="color" id="color_hex" name="color_hex" value="#b8996e" />
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Hábito
+                    </button>
+                    <a href="/habits" class="btn btn-outline">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

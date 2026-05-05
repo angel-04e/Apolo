@@ -1,0 +1,281 @@
+<%- include('partials/header', { 
+    title: 'Hábitos', 
+    description: 'Construye hábitos saludables que cambian tu vida.' 
+  }) %>
+
+<main class="container habits-section fade-in">
+
+  <!-- Título -->
+  <div class="section-header">
+    <div>
+      <h1><i class="fas fa-heart-pulse"></i> Hábitos Saludables</h1>
+      <p>Pequeñas acciones, grandes resultados.</p>
+    </div>
+    <div class="header-actions">
+      <a href="/habits/create" class="btn btn-gold">
+        <i class="fas fa-plus"></i> Nuevo Hábito
+        </a>
+    </div>
+  </div>
+
+  <!-- ── Racha global ── -->
+  <% if (rachaTotal > 0) { %>
+  <div class="streak-banner mb-4">
+    <div class="streak-inner">
+      <span class="streak-icon"><i class="fas fa-fire"></i></span>
+      <div>
+        <strong>¡Racha de <%= rachaTotal %> días!</strong>
+        <p>Sigue así, estás construyendo disciplina real.</p>
+      </div>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- ── Mis hábitos de hoy ── -->
+  <section class="card mb-4">
+    <div class="block-header">
+      <h2><i class="fas fa-calendar-check"></i> Mis hábitos de hoy</h2>
+      <span class="badge-counter">
+        <%= misHabitos.filter(h => h.completado_hoy).length %> / <%= misHabitos.length %> completados
+      </span>
+    </div>
+
+    <% if (misHabitos.length) { %>
+      <div class="habits-today-grid">
+        <% misHabitos.forEach(h => { %>
+          <div class="habit-card-today <%= h.completado_hoy ? 'done' : '' %>" data-id="<%= h.user_habit_id %>">
+            <div class="habit-icon-wrap" style="background:<%= h.color_hex %>22; border-color:<%= h.color_hex %>">
+              <i class="fas <%= h.icono || 'fa-star' %>" style="color:<%= h.color_hex %>"></i>
+            </div>
+            <div class="habit-info">
+              <h4><%= h.nombre %></h4>
+              <small><%= h.categoria %> · <%= h.frecuencia %></small>
+              <div class="habit-streak">
+                <i class="fas fa-fire"></i> Racha: <strong><%= h.racha_actual %></strong> / Máx: <%= h.racha_maxima %>
+              </div>
+            </div>
+            <button class="habit-toggle-btn <%= h.completado_hoy ? 'done' : '' %>" 
+                    data-id="<%= h.user_habit_id %>"
+                    title="<%= h.completado_hoy ? 'Marcar pendiente' : 'Marcar completado' %>">
+              <i class="fas <%= h.completado_hoy ? 'fa-check-circle' : 'fa-circle' %>"></i>
+            </button>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="empty-state-sm">
+        <i class="fas fa-seedling"></i>
+        <p>No tienes hábitos activos. <br>Explora el catálogo y agrega los que más te resuenen.</p>
+      </div>
+    <% } %>
+  </section>
+
+  <!-- ── Catálogo de hábitos ── -->
+  <section class="catalog-block">
+    <div class="block-header">
+      <h2><i class="fas fa-book-open"></i> Catálogo de Hábitos</h2>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-bar mb-3">
+      <select id="category-filter" class="form-control filter-select">
+        <option value="">Todas las categorías</option>
+        <option value="Salud">Salud</option>
+        <option value="Ejercicio">Ejercicio</option>
+        <option value="Nutrición">Nutrición</option>
+        <option value="Descanso">Descanso</option>
+        <option value="Productividad">Productividad</option>
+        <option value="Bienestar">Bienestar</option>
+      </select>
+      <label class="checkbox-label">
+        <input type="checkbox" id="recommended-only" />
+        <span>Solo recomendados <i class="fas fa-star"></i></span>
+      </label>
+    </div>
+
+    <!-- Listado -->
+    <div class="grid grid-3" id="habits-catalog">
+      <% catalogo.forEach(h => { 
+         const yaAnado = yaAnadidosSet.has(h.id);
+      %>
+        <div class="card card-hover habit-cat-card" 
+             data-categoria="<%= h.categoria %>"
+             data-recomendado="<%= h.recomendado %>">
+          <div class="habit-cat-header">
+            <div class="habit-icon-sm" style="background:<%= h.color_hex %>22; border-color:<%= h.color_hex %>">
+              <i class="fas <%= h.icono || 'fa-star' %>" style="color:<%= h.color_hex %>"></i>
+            </div>
+            <% if (h.recomendado) { %>
+              <span class="badge-rec"><i class="fas fa-star"></i> Recomendado</span>
+            <% } %>
+          </div>
+          <div class="card-body">
+            <span class="badge-category"><%= h.categoria %></span>
+            <h3 class="card-title"><%= h.nombre %></h3>
+            <p class="card-text"><%= h.descripcion || '' %></p>
+            <div class="card-meta-row">
+              <i class="fas fa-repeat"></i> <%= h.frecuencia %>
+            </div>
+            <div class="card-actions mt-2">
+              <% if (yaAnado) { %>
+                <button class="btn btn-outline btn-sm btn-added" disabled>
+                  <i class="fas fa-check"></i> Añadido
+                </button>
+              <% } else { %>
+                <button class="btn btn-primary btn-sm add-habit-btn" data-id="<%= h.id %>">
+                  <i class="fas fa-plus"></i> Añadir
+                </button>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <% if (!catalogo.length) { %>
+      <div class="empty-state">
+        <p>No hay hábitos en el catálogo aún.</p>
+      </div>
+    <% } %>
+  </section>
+
+</main>
+
+<style>
+  .habits-section { padding-bottom: 60px; }
+
+  .streak-banner { background: linear-gradient(135deg, rgba(184,153,110,0.12), rgba(201,169,122,0.08));
+    border: 1px solid rgba(184,153,110,0.3); border-radius: 14px; padding: 18px 24px; }
+  .streak-inner { display: flex; align-items: center; gap: 16px; }
+  .streak-emoji { font-size: 2.5rem; }
+  .streak-inner strong { color: #c9a97a; font-size: 1.1rem; }
+  .streak-inner p { color: #8b92a0; font-size: 0.85rem; margin-top: 2px; }
+
+  .habits-today-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .habit-card-today { display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+    background: rgba(184,153,110,0.04); border-radius: 10px; border: 1px solid rgba(184,153,110,0.1);
+    transition: all 0.3s; }
+  .habit-card-today.done { background: rgba(184,153,110,0.1); border-color: rgba(184,153,110,0.3); }
+  .habit-card-today.done h4 { text-decoration: line-through; color: #6b7280; }
+
+  .habit-icon-wrap { width: 44px; height: 44px; border-radius: 10px; border: 2px solid;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.2rem; }
+  .habit-info { flex: 1; min-width: 0; }
+  .habit-info h4 { font-size: 0.9rem; color: #c9a97a; margin-bottom: 2px; }
+  .habit-info small { font-size: 0.75rem; color: #6b7280; }
+  .habit-streak { font-size: 0.75rem; color: #8b92a0; margin-top: 4px; }
+  .habit-streak i { color: #b8996e; margin-right: 3px; }
+  .habit-streak strong { color: #c9a97a; }
+
+  .habit-toggle-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer;
+    color: rgba(184,153,110,0.4); transition: all 0.2s; padding: 4px; }
+  .habit-toggle-btn.done { color: #b8996e; }
+  .habit-toggle-btn:hover { transform: scale(1.15); color: #b8996e; }
+
+  .badge-counter { background: rgba(184,153,110,0.15); color: #8a7252; border-radius: 20px;
+    padding: 3px 12px; font-size: 0.8rem; }
+
+  /* Catálogo */
+
+  .habit-cat-card { overflow: hidden; }
+  .habit-cat-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 0; }
+  .habit-icon-sm { width: 38px; height: 38px; border-radius: 8px; border: 1px solid;
+    display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+  .badge-rec { background: rgba(255,193,7,0.1); color: #ffc107; border-radius: 4px; padding: 2px 8px; font-size: 0.72rem; }
+  .badge-category { background: rgba(184,153,110,0.1); color: #8a7252; border-radius: 4px; 
+    padding: 2px 8px; font-size: 0.72rem; display: inline-block; margin-bottom: 6px; }
+  .card-title { font-size: 0.95rem; color: #c9a97a; margin-bottom: 4px; }
+  .card-text { font-size: 0.82rem; color: #6b7280; margin-bottom: 6px; line-height: 1.4; }
+  .card-meta-row { font-size: 0.78rem; color: #8b92a0; }
+  .card-meta-row i { margin-right: 4px; color: #b8996e; }
+  .btn-added { opacity: 0.6; }
+
+  .empty-state-sm { text-align: center; padding: 32px; color: #6b7280; font-size: 0.88rem; line-height: 1.7; }
+  .empty-state-sm i { font-size: 2rem; opacity: 0.3; display: block; margin-bottom: 12px; }
+  .empty-state-sm a { color: #b8996e; }
+
+  .filters-bar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .filter-select { background: rgba(255,255,255,0.05); border: 1px solid rgba(184,153,110,0.25);
+    border-radius: 8px; padding: 8px 12px; color: #b8bcc4; font-size: 0.85rem; }
+  .checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #8b92a0; cursor: pointer; }
+
+  .mb-3 { margin-bottom: 1.5rem; }
+  .mb-4 { margin-bottom: 2rem; }
+  .mt-2 { margin-top: 1rem; }
+</style>
+
+<script>
+
+  /* ─── Filtros del catálogo ─── */
+
+  function applyFilters() {
+    const cat = document.getElementById('category-filter').value;
+    const rec = document.getElementById('recommended-only').checked;
+    document.querySelectorAll('.habit-cat-card').forEach(card => {
+      const matchCat = !cat || card.dataset.categoria === cat;
+      const matchRec = !rec || card.dataset.recomendado === '1';
+      card.style.display = (matchCat && matchRec) ? '' : 'none';
+    });
+  }
+  document.getElementById('category-filter')?.addEventListener('change', applyFilters);
+  document.getElementById('recommended-only')?.addEventListener('change', applyFilters);
+
+  /* ─── Toggle hábito completado ─── */
+
+  document.querySelectorAll('.habit-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      btn.disabled = true;
+      try {
+        const res = await fetch(`/habits/toggle/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+        const json = await res.json();
+        if (json.success) {
+          const card = btn.closest('.habit-card-today');
+          card.classList.toggle('done', json.completado);
+          btn.classList.toggle('done', json.completado);
+          btn.querySelector('i').className = `fas ${json.completado ? 'fa-check-circle' : 'fa-circle'}`;
+          // Actualizar racha
+          const streakEl = card.querySelector('.habit-streak strong');
+          if (streakEl) streakEl.textContent = json.racha;
+          // Actualizar contador
+          const done  = document.querySelectorAll('.habit-card-today.done').length;
+          const total = document.querySelectorAll('.habit-card-today').length;
+          const counter = document.querySelector('.badge-counter');
+          if (counter) counter.textContent = `${done} / ${total} completados`;
+        }
+      } catch (e) { console.error(e); alert('Error'); }
+      btn.disabled = false;
+    });
+  });
+
+  /* ─── Añadir hábito desde catálogo ─── */
+  
+  document.querySelectorAll('.add-habit-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      try {
+        const res = await fetch('/habits/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ habito_id: id })
+        });
+        const json = await res.json();
+        if (json.success) {
+          btn.innerHTML = '<i class="fas fa-check"></i> Añadido';
+          btn.classList.replace('btn-primary', 'btn-outline');
+          btn.classList.add('btn-added');
+          btn.disabled = true;
+          // Recargar "mis hábitos de hoy" 
+          setTimeout(() => location.reload(), 600);
+        } else {
+          btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus"></i> Añadir';
+        }
+      } catch {
+        btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus"></i> Añadir';
+      }
+    });
+  });
+</script>
+
+<%- include('partials/footer') %>

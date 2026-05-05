@@ -1,0 +1,184 @@
+<%- include('partials/header', { 
+    title: 'Estadísticas', 
+    description: 'Visualiza tu progreso físico y hábitos con gráficas generadas por Python/Matplotlib.' 
+  }) %>
+
+<main class="stats-page container fade-in">
+
+  <!-- Encabezado -->
+  <div class="section-header">
+    <h1><i class="fas fa-chart-line"></i> Estadísticas</h1>
+    <p>Análisis de tu progreso generado con <strong>Python · Matplotlib</strong></p>
+  </div>
+
+  <!-- Resumen de tarjetas -->
+  <section class="stats-summary grid grid-3 mb-4">
+    <div class="stat-card card">
+      <i class="fas fa-dumbbell stat-card-icon"></i>
+      <h3>Entrenamientos</h3>
+      <p class="stat-big"><%= stats.totalEntrenamientos %></p>
+      <small>completados en total</small>
+    </div>
+    <div class="stat-card card">
+      <i class="fas fa-seedling stat-card-icon"></i>
+      <h3>Hábitos logrados</h3>
+      <p class="stat-big"><%= stats.habitosCompletados %></p>
+      <small>registros completados</small>
+    </div>
+    <div class="stat-card card">
+      <i class="fas fa-fire stat-card-icon"></i>
+      <h3>Racha activa</h3>
+      <p class="stat-big"><%= stats.racha %> <% if(stats.racha > 0) %></p>
+      <small><%= stats.racha === 1 ? 'día consecutivo' : stats.racha > 1 ? 'días consecutivos' : 'Comienza hoy' %></small>
+    </div>
+  </section>
+
+  <!-- Indicador de fuente Python -->
+  <div class="python-badge mb-3">
+    <i class="fab fa-python"></i>
+    <span>Gráficas generadas en tiempo real con <strong>Python 3 · Matplotlib</strong> desde el servidor</span>
+    <form action="/stats/refresh" method="POST" style="display:inline">
+      <button type="submit" class="btn-refresh" title="Regenerar gráficas">
+        <i class="fas fa-sync-alt"></i> Actualizar
+      </button>
+    </form>
+  </div>
+
+  <!-- Gráficas Python -->
+  <section class="charts-section grid grid-2 mt-2">
+
+    <!-- Gráfica 1: Progreso semanal -->
+    <div class="chart-card card">
+      <div class="chart-header">
+        <h3><i class="fas fa-calendar-week"></i> Progreso Semanal</h3>
+        <span class="chart-badge">line chart</span>
+      </div>
+      <% if (charts.weekly) { %>
+        <img src="<%= charts.weekly %>?t=<%= Date.now() %>" alt="Progreso semanal" class="chart-img" />
+      <% } else { %>
+        <div class="chart-placeholder">
+          <i class="fas fa-chart-line"></i>
+          <p>No hay datos de la semana todavía.<br><a href="/routines">Completa tu primera rutina</a></p>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Gráfica 2: Distribución de hábitos (donut) -->
+    <div class="chart-card card">
+      <div class="chart-header">
+        <h3><i class="fas fa-circle-half-stroke"></i> Distribución de Hábitos</h3>
+        <span class="chart-badge">donut chart</span>
+      </div>
+      <% if (charts.habits) { %>
+        <img src="<%= charts.habits %>?t=<%= Date.now() %>" alt="Distribución de hábitos" class="chart-img" />
+      <% } else { %>
+        <div class="chart-placeholder">
+          <i class="fas fa-heart-pulse"></i>
+          <p>No tienes hábitos activos.<br><a href="/habits">Añade tus primeros hábitos</a></p>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Gráfica 3: Evolución de peso -->
+    <div class="chart-card card">
+      <div class="chart-header">
+        <h3><i class="fas fa-weight-scale"></i> Evolución de Peso</h3>
+        <span class="chart-badge">área chart</span>
+      </div>
+      <% if (charts.weight) { %>
+        <img src="<%= charts.weight %>?t=<%= Date.now() %>" alt="Evolución de peso" class="chart-img" />
+      <% } else { %>
+        <div class="chart-placeholder">
+          <i class="fas fa-weight-scale"></i>
+          <p>Sin registros de peso.<br><a href="/profile">Registra tu peso en el perfil</a></p>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Gráfica 4: Calorías semanal (barras) -->
+    <div class="chart-card card">
+      <div class="chart-header">
+        <h3><i class="fas fa-utensils"></i> Calorías Semanales</h3>
+        <span class="chart-badge">bar chart</span>
+      </div>
+      <% if (charts.calories) { %>
+        <img src="<%= charts.calories %>?t=<%= Date.now() %>" alt="Calorías semanales" class="chart-img" />
+      <% } else { %>
+        <div class="chart-placeholder">
+          <i class="fas fa-apple-whole"></i>
+          <p>Sin registros de nutrición.<br><a href="/nutrition">Lleva tu plan nutricional</a></p>
+        </div>
+      <% } %>
+    </div>
+
+  </section>
+
+  <!-- Gráfica 5: Heatmap de actividad mensual (ancho completo) -->
+  <div class="chart-card card mt-3">
+    <div class="chart-header">
+      <h3><i class="fas fa-calendar-days"></i> Actividad del Mes</h3>
+      <span class="chart-badge">heatmap</span>
+    </div>
+    <% if (charts.streak) { %>
+      <img src="<%= charts.streak %>?t=<%= Date.now() %>" alt="Actividad del mes" class="chart-img chart-img-wide" />
+    <% } else { %>
+      <div class="chart-placeholder">
+        <i class="fas fa-calendar-check"></i>
+        <p>Sin actividad registrada este mes</p>
+      </div>
+    <% } %>
+  </div>
+
+</main>
+
+<style>
+  .stats-page { padding-bottom: 60px; }
+
+  .stat-card { text-align: center; padding: 24px 20px; }
+  .stat-card-icon { font-size: 2rem; color: var(--color-gold, #b8996e); margin-bottom: 10px; display: block; }
+  .stat-big { font-size: 2.5rem; font-weight: 700; color: var(--color-gold, #b8996e); margin: 8px 0 4px; }
+  .stat-card small { color: var(--color-gray-light, #8b92a0); font-size: 0.8rem; }
+
+  .python-badge {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(184,153,110,0.08);
+    border: 1px solid rgba(184,153,110,0.25);
+    border-radius: 10px; padding: 12px 20px;
+    font-size: 0.88rem; color: var(--color-light-text, #b8bcc4);
+  }
+  .python-badge .fab { font-size: 1.4rem; color: #4B8BBE; }
+  .python-badge strong { color: var(--color-gold, #b8996e); }
+  .btn-refresh {
+    margin-left: auto; background: rgba(184,153,110,0.2);
+    border: 1px solid rgba(184,153,110,0.4); color: var(--color-gold, #b8996e);
+    border-radius: 8px; padding: 6px 14px; cursor: pointer; font-size: 0.82rem;
+    transition: all 0.2s;
+  }
+  .btn-refresh:hover { background: rgba(184,153,110,0.35); }
+
+  .chart-card { overflow: hidden; }
+  .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .chart-header h3 { font-size: 1rem; color: var(--color-gold-light, #c9a97a); }
+  .chart-badge {
+    font-size: 0.7rem; background: rgba(184,153,110,0.15);
+    color: var(--color-gold-dim, #8a7252); border-radius: 20px; padding: 2px 10px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .chart-img { width: 100%; border-radius: 8px; display: block; }
+  .chart-img-wide { max-height: 200px; object-fit: cover; }
+
+  .chart-placeholder {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 180px; color: var(--color-gray, #6b7280); gap: 12px;
+  }
+  .chart-placeholder i { font-size: 2.5rem; opacity: 0.4; }
+  .chart-placeholder p { font-size: 0.9rem; text-align: center; line-height: 1.6; }
+  .chart-placeholder a { color: var(--color-gold, #b8996e); }
+
+  .mb-3 { margin-bottom: 1.5rem; }
+  .mb-4 { margin-bottom: 2rem; }
+  .mt-2 { margin-top: 1rem; }
+  .mt-3 { margin-top: 1.5rem; }
+</style>
+
+<%- include('partials/footer') %>

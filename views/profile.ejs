@@ -1,0 +1,566 @@
+<%- include('partials/header', { 
+    title: 'Mi Perfil', 
+    description: 'Gestiona tu información personal, objetivos fitness y progreso.' 
+  }) %>
+
+<main class="container profile-page fade-in">
+
+  <!-- Encabezado -->
+  <div class="section-header">
+    <h1><i class="fas fa-user-circle"></i> Mi Perfil</h1>
+    <p>Administra tus datos, objetivos y avance personal.</p>
+  </div>
+
+  <!-- ── Bloque principal ── -->
+  <div class="profile-grid">
+
+    <!-- Columna izquierda: avatar + datos básicos -->
+    <aside class="profile-aside card">
+
+      <!-- Avatar con upload -->
+      <div class="avatar-container">
+        <% if (userData.avatar_url) { %>
+          <img src="<%= userData.avatar_url %>" alt="<%= userData.nombre %>" class="avatar-img" id="avatarImg" />
+        <% } else { %>
+          <div class="avatar-placeholder" id="avatarPlaceholder">
+            <i class="fas fa-user"></i>
+          </div>
+        <% } %>
+        <label for="avatarInput" class="avatar-upload-btn">
+          <i class="fas fa-camera"></i> Elegir foto
+        </label>
+        <input type="file" id="avatarInput" accept="image/*" style="display:none" />
+        <div class="avatar-name"><%= userData.nombre || user.nombre %></div>
+        <div class="avatar-email"><%= userData.email || user.email %></div>
+        <% if (userData.objetivo) { %>
+          <span class="objetivo-badge"><%= userData.objetivo %></span>
+        <% } %>
+      </div>
+
+      <!-- Stats rápidas -->
+      <div class="quick-stats">
+        <div class="qs-item">
+          <i class="fas fa-dumbbell"></i>
+          <span><%= stats.totalRutinas %></span>
+          <small>Rutinas</small>
+        </div>
+        <div class="qs-item">
+          <i class="fas fa-bolt"></i>
+          <span><%= stats.totalEntrenamientos %></span>
+          <small>Entrenam.</small>
+        </div>
+        <div class="qs-item">
+          <i class="fas fa-fire"></i>
+          <span><%= stats.racha %><% if(stats.racha > 0) %></span>
+          <small>Racha</small>
+        </div>
+        <div class="qs-item">
+          <i class="fas fa-heart-pulse"></i>
+          <span><%= stats.totalHabitos %></span>
+          <small>Hábitos</small>
+        </div>
+      </div>
+
+      <!-- Datos físicos -->
+      <div class="physical-data">
+        <% if(userData.edad) { %><div class="pd-row"><span>Edad</span><strong><%= userData.edad %> años</strong></div><% } %>
+        <% if(userData.altura_cm) { %><div class="pd-row"><span>Altura</span><strong><%= userData.altura_cm %> cm</strong></div><% } %>
+        <% if(userData.peso_kg) { %><div class="pd-row"><span>Peso actual</span><strong><%= userData.peso_kg %> kg</strong></div><% } %>
+        <% if(userData.altura_cm && userData.peso_kg) { 
+           const imc = (userData.peso_kg / Math.pow(userData.altura_cm/100, 2)).toFixed(1);
+           const imcLabel = imc < 18.5 ? 'Bajo peso' : imc < 25 ? 'Normal' : imc < 30 ? 'Sobrepeso' : 'Obesidad';
+        %>
+          <div class="pd-row"><span>IMC</span><strong><%= imc %> <em style="font-weight:400;color:#8a7252">(<%= imcLabel %>)</em></strong></div>
+        <% } %>
+        <% if(userData.bio) { %><div class="pd-bio"><p><%= userData.bio %></p></div><% } %>
+      </div>
+
+      <button id="openEditBtn" class="btn btn-primary btn-block mt-3">
+        <i class="fas fa-pen"></i> Editar perfil
+      </button>
+    </aside>
+
+    <!-- Columna derecha: contenido principal -->
+    <div class="profile-main">
+
+      <!-- Gráfica de peso (Python) -->
+      
+      <div class="card mb-3">
+        <div class="block-header">
+          <h2><i class="fas fa-weight-scale"></i> Evolución de Peso</h2>
+          <button id="openWeightBtn" class="btn btn-outline btn-sm">+ Registrar peso</button>
+        </div>
+        <% if (weightChart) { %>
+          <img src="<%= weightChart %>?t=<%= Date.now() %>" alt="Evolución de peso" class="weight-chart-img" />
+        <% } else { %>
+          <div class="empty-state-sm">
+            <i class="fas fa-weight-scale"></i>
+            <p>No hay registros de peso aún. <br>Empieza registrando tu peso actual.</p>
+          </div>
+        <% } %>
+
+        <!-- Historial de peso -->
+        <% if (pesosHistorial.length) { %>
+          <table class="weight-table mt-2">
+            <thead><tr><th>Fecha</th><th>Peso</th></tr></thead>
+            <tbody>
+              <% pesosHistorial.slice(0, 5).forEach(p => { %>
+                <tr>
+                  <td><%= new Date(p.fecha).toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' }) %></td>
+                  <td><strong><%= p.peso_kg %> kg</strong></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } %>
+      </div>
+
+      <!-- Mis rutinas -->
+      <div class="card mb-3">
+        <div class="block-header">
+          <h2><i class="fas fa-dumbbell"></i> Mis Rutinas</h2>
+          <a href="/routines" class="btn btn-outline btn-sm">Ver todas</a>
+        </div>
+        <% if (misRutinas.length) { %>
+          <div class="routine-list">
+            <% misRutinas.forEach(r => { %>
+              <a href="/routines/<%= r.id %>" class="routine-item">
+                <div>
+                  <strong><%= r.nombre %></strong>
+                  <small><%= r.tipo || '—' %> · <%= r.nivel || '—' %> · <%= r.duracion %> min</small>
+                </div>
+                <i class="fas fa-chevron-right"></i>
+              </a>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="empty-state-sm">
+            <p>No tienes rutinas aún. <a href="/routines/create">Crear una</a></p>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Mis hábitos -->
+      <div class="card mb-3">
+        <div class="block-header">
+          <h2><i class="fas fa-heart-pulse"></i> Mis Hábitos</h2>
+          <a href="/habits" class="btn btn-outline btn-sm">Ver todos</a>
+        </div>
+        <% if (misHabitos && misHabitos.length) { %>
+          <div class="habits-list">
+            <% misHabitos.forEach(h => { %>
+              <div class="habit-item-profile">
+                <div class="habit-icon" style="background-color: <%= h.color_hex || '#d4af37' %>20; color: <%= h.color_hex || '#d4af37' %>">
+                  <i class="fas <%= h.icono || 'fa-heart' %>"></i>
+                </div>
+                <div class="habit-info">
+                  <strong><%= h.nombre %></strong>
+                  <small><%= h.categoria || 'General' %></small>
+                </div>
+                <div class="habit-streak">
+                  <i class="fas fa-fire"></i> <%= h.racha_actual || 0 %> días
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="empty-state-sm">
+            <p>No tienes hábitos aún. <a href="/habits">Explorar hábitos</a></p>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Mis comidas personalizadas -->
+      <div class="card mb-3">
+        <div class="block-header">
+          <h2><i class="fas fa-utensils"></i> Mis Comidas</h2>
+          <a href="/nutrition" class="btn btn-outline btn-sm">Ver todas</a>
+        </div>
+        <% if (misComidas && misComidas.length) { %>
+          <div class="meals-list">
+            <% misComidas.forEach(m => { %>
+              <div class="meal-item-profile">
+                <div class="meal-info">
+                  <strong><%= m.nombre %></strong>
+                  <small><%= m.tipo_comida || 'Snack' %></small>
+                </div>
+                <div class="meal-macros-sm">
+                  <span><i class="fas fa-fire"></i> <%= m.calorias %> kcal</span>
+                  <span><i class="fas fa-drumstick-bite"></i> <%= m.proteina_g %>g</span>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="empty-state-sm">
+            <p>No tienes comidas personalizadas. <a href="/nutrition/create">Crear una</a></p>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Próximos entrenamientos -->
+      <div class="card mb-3">
+        <div class="block-header">
+          <h2><i class="fas fa-calendar-check"></i> Próximos Entrenamientos</h2>
+          <button id="openAgendaBtn" class="btn btn-outline btn-sm">+ Agendar</button>
+        </div>
+        <% if (proximosEnts.length) { %>
+          <ul class="agenda-list">
+            <% proximosEnts.forEach(a => { %>
+              <li class="agenda-item">
+                <div class="agenda-date">
+                  <strong><%= new Date(a.fecha_programada).toLocaleDateString('es-CO', { weekday:'short', day:'2-digit', month:'short' }) %></strong>
+                  <span><%= String(a.hora_programada).slice(0,5) %></span>
+                </div>
+                <div class="agenda-info">
+                  <div class="agenda-title"><%= a.titulo %></div>
+                  <% if (a.rutina_nombre) { %><small><%= a.rutina_nombre %></small><% } %>
+                </div>
+              </li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <div class="empty-state-sm">
+            <p>No hay entrenamientos agendados. <br>Programa el de mañana para mantener tu racha.</p>
+          </div>
+        <% } %>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- ── Modal: Editar perfil ── -->
+<div id="editProfileModal" class="modal hidden">
+  <div class="modal-overlay" id="closeModalOverlay"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Editar Perfil</h2>
+      <button id="closeEditBtn" class="modal-close"><i class="fas fa-times"></i></button>
+    </div>
+    <form id="editProfileForm" class="form-grid">
+      <label>
+        Nombre
+        <input type="text" name="nombre" value="<%= userData.nombre || user.nombre %>" required />
+      </label>
+      <label>
+        Edad
+        <input type="number" name="edad" min="10" max="100" value="<%= userData.edad || '' %>" placeholder="Ej: 25" />
+      </label>
+      <label>
+        Altura (cm)
+        <input type="number" name="altura_cm" min="100" max="250" step="0.1" value="<%= userData.altura_cm || '' %>" placeholder="Ej: 175" />
+      </label>
+      <label>
+        Peso actual (kg)
+        <input type="number" name="peso_kg" min="30" max="300" step="0.1" value="<%= userData.peso_kg || '' %>" placeholder="Ej: 75.5" />
+      </label>
+      <label>
+        Objetivo
+        <select name="objetivo">
+          <option value="">Seleccionar...</option>
+          <option value="Ganancia muscular" <%= (userData.objetivo === 'Ganancia muscular') ? 'selected' : '' %>>Ganancia muscular</option>
+          <option value="Pérdida de peso"   <%= (userData.objetivo === 'Pérdida de peso')   ? 'selected' : '' %>>Pérdida de peso</option>
+          <option value="Definición"         <%= (userData.objetivo === 'Definición')         ? 'selected' : '' %>>Definición</option>
+          <option value="Mantenimiento"      <%= (userData.objetivo === 'Mantenimiento')      ? 'selected' : '' %>>Mantenimiento</option>
+          <option value="Resistencia"        <%= (userData.objetivo === 'Resistencia')        ? 'selected' : '' %>>Resistencia</option>
+        </select>
+      </label>
+      <label style="grid-column: 1 / -1;">
+        Bio personal
+        <textarea name="bio" rows="3" placeholder="Cuéntanos algo sobre ti..."><%= userData.bio || '' %></textarea>
+      </label>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <button type="button" id="cancelEditBtn" class="btn btn-outline">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ── Modal: Registrar peso ── -->
+<div id="weightModal" class="modal hidden">
+  <div class="modal-overlay" id="closeWeightOverlay"></div>
+  <div class="modal-content modal-sm">
+    <div class="modal-header">
+      <h2>Registrar Peso</h2>
+      <button id="closeWeightBtn" class="modal-close"><i class="fas fa-times"></i></button>
+    </div>
+    <form id="weightForm" class="form-grid">
+      <label>
+        Peso (kg)
+        <input type="number" name="peso_kg" min="30" max="300" step="0.1" placeholder="Ej: 75.5" required />
+      </label>
+      <label>
+        Notas (opcional)
+        <input type="text" name="notas" placeholder="Ej: después de desayuno" />
+      </label>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" id="cancelWeightBtn" class="btn btn-outline">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ── Modal: Agendar entrenamiento ── -->
+<div id="agendaModal" class="modal hidden">
+  <div class="modal-overlay" id="closeAgendaOverlay"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Agendar Entrenamiento</h2>
+      <button id="closeAgendaBtn" class="modal-close"><i class="fas fa-times"></i></button>
+    </div>
+    <form id="agendaForm" class="form-grid">
+      <label>
+        Título
+        <input type="text" name="titulo" placeholder="Ej: Día de piernas" required />
+      </label>
+      <label>
+        Rutina (opcional)
+        <select name="rutina_id">
+          <option value="">Sin rutina específica</option>
+          <% misRutinas.forEach(r => { %>
+            <option value="<%= r.id %>"><%= r.nombre %></option>
+          <% }) %>
+        </select>
+      </label>
+      <label>
+        Fecha
+        <input type="date" name="fecha_programada" required />
+      </label>
+      <label>
+        Hora
+        <input type="time" name="hora_programada" value="07:00" />
+      </label>
+      <label style="grid-column: 1 / -1;">
+        Descripción
+        <textarea name="descripcion" rows="2" placeholder="Notas o recordatorio..."></textarea>
+      </label>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary">Agendar</button>
+        <button type="button" id="cancelAgendaBtn" class="btn btn-outline">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .profile-page { padding-bottom: 60px; }
+
+  .profile-grid { display: grid; grid-template-columns: 300px 1fr; gap: 24px; }
+  @media (max-width: 900px) { .profile-grid { grid-template-columns: 1fr; } }
+
+  /* Aside */
+  .profile-aside { padding: 30px 20px; }
+  .avatar-container { text-align: center; margin-bottom: 24px; }
+  .avatar-placeholder { width: 90px; height: 90px; border-radius: 50%; background: rgba(184,153,110,0.15);
+    border: 2px solid #b8996e; display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem; color: #b8996e; margin: 0 auto 12px; }
+  .avatar-img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #b8996e; margin: 0 auto 12px; display: block; }
+  .avatar-name { font-size: 1.2rem; font-weight: 600; color: #c9a97a; }
+  .avatar-email { font-size: 0.82rem; color: #6b7280; margin-top: 4px; }
+  .objetivo-badge { display: inline-block; margin-top: 8px; background: rgba(184,153,110,0.15);
+    color: #b8996e; border-radius: 20px; padding: 3px 14px; font-size: 0.78rem; }
+  .avatar-upload-btn { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 8px auto 0; padding: 6px 14px; 
+    background: rgba(184,153,110,0.2); border: 1px solid #b8996e; border-radius: 20px; 
+    cursor: pointer; font-size: 0.75rem; color: #c9a97a; transition: all 0.2s; }
+  .avatar-upload-btn:hover { background: rgba(184,153,110,0.35); transform: scale(1.02); }
+  .avatar-container { text-align: center; margin-bottom: 24px; }
+
+  .quick-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+  .qs-item { text-align: center; padding: 10px 4px; background: rgba(184,153,110,0.06); border-radius: 8px; }
+  .qs-item i { font-size: 1rem; color: #b8996e; display: block; margin-bottom: 4px; }
+  .qs-item span { font-size: 1.1rem; font-weight: 700; color: #c9a97a; }
+  .qs-item small { font-size: 0.68rem; color: #6b7280; display: block; }
+
+  .physical-data { border-top: 1px solid rgba(184,153,110,0.15); padding-top: 16px; }
+  .pd-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 0.88rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04); color: #b8bcc4; }
+  .pd-row span { color: #6b7280; }
+  .pd-bio { margin-top: 12px; font-size: 0.85rem; color: #8b92a0; font-style: italic; line-height: 1.5; }
+
+  .btn-block { width: 100%; text-align: center; }
+
+  /* Main */
+  .profile-main .card { padding: 24px; }
+  .block-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .block-header h2 { font-size: 1rem; color: #c9a97a; }
+  .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+
+  .weight-chart-img { width: 100%; border-radius: 8px; }
+  .weight-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .weight-table th { color: #6b7280; font-weight: 500; text-align: left; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .weight-table td { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04); color: #b8bcc4; }
+  .weight-table strong { color: #c9a97a; }
+
+  .routine-list { display: flex; flex-direction: column; gap: 8px; }
+  .routine-item { display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; background: rgba(184,153,110,0.06); border-radius: 8px;
+    text-decoration: none; color: #b8bcc4; transition: all 0.2s; }
+  .routine-item:hover { background: rgba(184,153,110,0.12); color: #c9a97a; }
+  .routine-item strong { display: block; color: #c9a97a; font-size: 0.9rem; }
+  .routine-item small { color: #6b7280; font-size: 0.78rem; }
+
+  .agenda-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .agenda-item { display: flex; gap: 16px; padding: 12px 16px; background: rgba(184,153,110,0.06); border-radius: 8px; }
+  .agenda-date { min-width: 80px; text-align: center; color: #b8996e; }
+  .agenda-date strong { display: block; font-size: 0.88rem; }
+  .agenda-date span { font-size: 0.78rem; color: #6b7280; }
+  .agenda-title { font-size: 0.9rem; color: #c9a97a; font-weight: 600; }
+  .agenda-info small { color: #6b7280; font-size: 0.78rem; }
+
+  .empty-state-sm { text-align: center; padding: 30px 16px; color: #6b7280; font-size: 0.88rem; line-height: 1.6; }
+  .empty-state-sm i { font-size: 2rem; opacity: 0.3; display: block; margin-bottom: 10px; }
+  .empty-state-sm a { color: #b8996e; }
+
+  /* Modal */
+  .modal { position: fixed; inset: 0; z-index: 9000; display: flex; align-items: center; justify-content: center; }
+  .modal.hidden { display: none; }
+  .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); }
+  .modal-content { position: relative; z-index: 1; background: #12181f; border: 1px solid rgba(184,153,110,0.3);
+    border-radius: 16px; padding: 32px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
+  .modal-sm { max-width: 400px; }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .modal-header h2 { color: #c9a97a; font-size: 1.2rem; }
+  .modal-close { background: none; border: none; color: #6b7280; font-size: 1.2rem; cursor: pointer; }
+  .modal-close:hover { color: #b8996e; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-grid label { display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; color: #8b92a0; }
+  .form-grid input, .form-grid select, .form-grid textarea {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(184,153,110,0.25);
+    border-radius: 8px; padding: 10px 12px; color: #b8bcc4; font-size: 0.9rem; 
+    font-family: inherit; width: 100%;
+  }
+  .form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus {
+    outline: none; border-color: #b8996e;
+  }
+  .modal-actions { grid-column: 1 / -1; display: flex; gap: 12px; margin-top: 8px; }
+  .mb-3 { margin-bottom: 1.5rem; }
+  .mt-2 { margin-top: 1rem; }
+  .mt-3 { margin-top: 1.5rem; }
+</style>
+
+<script>
+  /* ─── Avatar upload ─── */
+  const avatarInput = document.getElementById('avatarInput');
+  avatarInput?.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append('avatar', file);
+    
+    try {
+      const res = await fetch('/profile/avatar', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Actualizar imagen
+        const img = document.getElementById('avatarImg');
+        const placeholder = document.getElementById('avatarPlaceholder');
+        if (img) {
+          img.src = data.avatarUrl + '?t=' + Date.now();
+        } else if (placeholder) {
+          placeholder.outerHTML = `<img src="${data.avatarUrl}?t=${Date.now()}" alt="Avatar" class="avatar-img" id="avatarImg" />`;
+        }
+      } else {
+        alert(data.message || 'Error al subir imagen');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error al subir imagen');
+    }
+  });
+  
+  /* ─── Helpers modal ─── */
+  function openModal(id)  { document.getElementById(id).classList.remove('hidden'); }
+  function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+  ['Edit', 'Weight', 'Agenda'].forEach(name => {
+    const id = name.toLowerCase() + 'ProfileModal'.replace('Profile', name === 'Edit' ? 'Profile' : '');
+  });
+
+  // Edit profile
+  document.getElementById('openEditBtn')?.addEventListener('click', () => openModal('editProfileModal'));
+  document.getElementById('closeEditBtn')?.addEventListener('click', () => closeModal('editProfileModal'));
+  document.getElementById('cancelEditBtn')?.addEventListener('click', () => closeModal('editProfileModal'));
+  document.getElementById('closeModalOverlay')?.addEventListener('click', () => closeModal('editProfileModal'));
+
+  // Weight
+  document.getElementById('openWeightBtn')?.addEventListener('click', () => openModal('weightModal'));
+  document.getElementById('closeWeightBtn')?.addEventListener('click', () => closeModal('weightModal'));
+  document.getElementById('cancelWeightBtn')?.addEventListener('click', () => closeModal('weightModal'));
+  document.getElementById('closeWeightOverlay')?.addEventListener('click', () => closeModal('weightModal'));
+
+  // Agenda
+  document.getElementById('openAgendaBtn')?.addEventListener('click', () => openModal('agendaModal'));
+  document.getElementById('closeAgendaBtn')?.addEventListener('click', () => closeModal('agendaModal'));
+  document.getElementById('cancelAgendaBtn')?.addEventListener('click', () => closeModal('agendaModal'));
+  document.getElementById('closeAgendaOverlay')?.addEventListener('click', () => closeModal('agendaModal'));
+
+  /* Fecha mínima = hoy */
+  const fechaInput = document.querySelector('[name="fecha_programada"]');
+  if (fechaInput) fechaInput.min = new Date().toISOString().split('T')[0];
+
+  /* ─── Submit: Editar perfil ─── */
+  document.getElementById('editProfileForm')?.addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = e.target.querySelector('[type=submit]');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    try {
+      const res = await fetch('/profile/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+      if (json.success) { closeModal('editProfileModal'); location.reload(); }
+      else alert(json.message || 'Error');
+    } catch { alert('Error de red'); }
+    btn.disabled = false; btn.textContent = 'Guardar cambios';
+  });
+
+  /* ─── Submit: Registrar peso ─── */
+  document.getElementById('weightForm')?.addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = e.target.querySelector('[type=submit]');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    try {
+      const res = await fetch('/profile/weight', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+      if (json.success) { closeModal('weightModal'); location.reload(); }
+      else alert('Error al registrar');
+    } catch { alert('Error de red'); }
+    btn.disabled = false; btn.textContent = 'Guardar';
+  });
+
+  /* ─── Submit: Agendar entrenamiento ─── */
+  document.getElementById('agendaForm')?.addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = e.target.querySelector('[type=submit]');
+    btn.disabled = true; btn.textContent = 'Agendando...';
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    try {
+      const res = await fetch('/agenda/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+      if (json.success) { closeModal('agendaModal'); location.reload(); }
+      else alert('Error');
+    } catch { alert('Error de red'); }
+    btn.disabled = false; btn.textContent = 'Agendar';
+  });
+</script>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,106 @@
+<!-- APOLO ⚡ — Header / Navbar -->
+ 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="<%= description || 'Apolo — Gestión de vida saludable' %>">
+  <title><%= title || 'Apolo ⚡' %></title>
+  <link rel="icon" type="image/png" href="/images/capr.png">
+
+  <!-- Font Awesome -->
+  <script src="https://kit.fontawesome.com/6d83f5d2b2.js" crossorigin="anonymous" defer></script>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+  <!-- Overlay para sidebar móvil -->
+  <div class="overlay" id="sidebar-overlay"></div>
+
+  <!-- ── Navbar ── -->
+  <header class="navbar">
+    <div class="navbar-left">
+      <button id="sidebar-toggle" class="menu-toggle" aria-label="Abrir menú">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <a href="/dashboard" class="navbar-logo">
+        <span class="logo-text">Apolo</span>
+      </a>
+    </div>
+
+    <nav class="navbar-links" aria-label="Navegación principal">
+      <a class="nav-link" href="/dashboard">Inicio</a>
+      <a class="nav-link" href="/routines">Rutinas</a>
+      <a class="nav-link" href="/nutrition">Nutrición</a>
+      <a class="nav-link" href="/habits">Hábitos</a>
+      <a class="nav-link" href="/stats">Estadísticas</a>
+      <a class="nav-link" href="/profile">Perfil</a>
+    </nav>
+
+    <div class="navbar-right">
+      <% if (user) { %>
+        <span class="user-name">Hola, <strong><%= user.nombre || user.name || 'Atleta' %></strong></span>
+        <a href="/logout" class="logout-btn" title="Cerrar sesión" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:rgba(184,153,110,0.1);color:var(--gold);text-decoration:none;transition:all 0.3s;">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span style="font-size:0.85rem;">Cerrar sesión</span>
+        </a>
+      <% } else { %>
+        <a href="/auth/login-register" class="btn-login">Iniciar Sesión</a>
+      <% } %>
+    </div>
+  </header>
+
+  <!-- ── Sidebar (móvil) ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-logo">Apolo ⚡</span>
+      <button id="sidebar-close" class="close-btn" aria-label="Cerrar menú">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <nav class="sidebar-menu">
+      <a class="nav-link" href="/dashboard"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
+      <a class="nav-link" href="/routines"><i class="fa-solid fa-dumbbell"></i><span>Rutinas</span></a>
+      <a class="nav-link" href="/nutrition"><i class="fa-solid fa-apple-whole"></i><span>Nutrición</span></a>
+      <a class="nav-link" href="/habits"><i class="fa-solid fa-heart-pulse"></i><span>Hábitos</span></a>
+      <a class="nav-link" href="/stats"><i class="fa-solid fa-chart-line"></i><span>Estadísticas</span></a>
+      <a class="nav-link" href="/profile"><i class="fa-solid fa-user"></i><span>Perfil</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <% if (user) { %>
+        <a href="/logout" class="logout-btn" style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;text-decoration:none;color:var(--text-dim)">
+          <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+        </a>
+      <% } %>
+    </div>
+  </aside>
+
+  <!-- ── Scripts del header ── -->
+  <script>
+    /* Sidebar toggle */
+    const sidebar  = document.getElementById('sidebar');
+    const overlay  = document.getElementById('sidebar-overlay');
+    const openBtn  = document.getElementById('sidebar-toggle');
+    const closeBtn = document.getElementById('sidebar-close');
+
+    function openSidebar()  { sidebar.classList.add('open'); overlay.classList.add('visible'); document.body.style.overflow = 'hidden'; }
+    function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('visible'); document.body.style.overflow = ''; }
+
+    openBtn?.addEventListener('click', openSidebar);
+    closeBtn?.addEventListener('click', closeSidebar);
+    overlay?.addEventListener('click', closeSidebar);
+
+    /* Marcar nav-link activo */
+    const path = window.location.pathname;
+    document.querySelectorAll('.nav-link').forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && (path === href || (href !== '/dashboard' && path.startsWith(href)))) {
+        link.classList.add('active');
+        link.setAttribute('data-active', 'true');
+      }
+    });
+  </script>

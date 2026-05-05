@@ -1,0 +1,84 @@
+<!-- APOLO ⚡ — Footer  -->
+
+<footer class="apolo-footer">
+  <div class="footer-inner">
+
+    <div class="footer-brand">
+      <span class="footer-logo">Apolo</span>
+      <p>Forja tu cuerpo.<br>Alcanza tu destino.</p>
+    </div>
+
+    <nav class="footer-nav">
+      <div class="footer-col">
+        <h4>Plataforma</h4>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/routines">Rutinas</a>
+        <a href="/nutrition">Nutrición</a>
+      </div>
+      <div class="footer-col">
+        <h4>Progreso</h4>
+        <a href="/habits">Hábitos</a>
+        <a href="/stats">Estadísticas</a>
+        <a href="/profile">Mi Perfil</a>
+      </div>
+    </nav>
+
+    <div class="footer-quote">
+      <em>"Mens sana in corpore sano"</em>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <span>&copy; <strong>angel.04e</strong> </span>
+  </div>
+</footer>
+
+<style>
+  .apolo-footer {
+    background: var(--bg-2, #12181f);
+    border-top: 1px solid rgba(184,153,110,0.15);
+    margin-top: 60px;
+    padding: 48px 0 0;
+  }
+  .footer-inner {
+    max-width: 1280px; width: 92%; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr auto auto;
+    gap: 40px; align-items: start;
+    padding-bottom: 40px;
+    grid-template-columns: 1fr auto 1fr;
+  }
+  @media (max-width: 700px) {
+    .footer-inner { grid-template-columns: 1fr; gap: 28px; }
+    .footer-nav { display: grid; grid-template-columns: 1fr 1fr; }
+  }
+
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 700;
+    background: linear-gradient(135deg, #fff, #c9a97a, #b8996e);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block; margin-bottom: 12px;
+  }
+  .footer-bolt { filter: drop-shadow(0 0 6px rgba(184,153,110,0.7)); }
+  .footer-brand p { font-size: 0.85rem; color: #6b7280; line-height: 1.7; }
+
+  .footer-nav { display: flex; gap: 48px; }
+  .footer-col { display: flex; flex-direction: column; gap: 8px; }
+  .footer-col h4 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: #8a7252; margin-bottom: 4px; font-weight: 600; }
+  .footer-col a { font-size: 0.85rem; color: #6b7280; text-decoration: none; transition: color 0.2s; }
+  .footer-col a:hover { color: #c9a97a; }
+
+  .footer-quote { font-family: 'Playfair Display', serif; font-size: 0.95rem; color: #8a7252; font-style: italic; margin-top: 50px; text-align: right;}
+
+  .footer-bottom {
+    border-top: 1px solid rgba(184,153,110,0.1);
+    text-align: center; padding: 16px 24px;
+    font-size: 0.78rem; color: #6b7280;
+  }
+  .footer-bottom strong { color: #b8996e; }
+</style>
+
+</body>
+</html>

@@ -1,0 +1,220 @@
+<%- include('partials/header', { 
+    title: 'Rutinas | Apolo', 
+    description: 'Gestiona tus rutinas de entrenamiento.' 
+  }) %>
+
+<main class="container routines-section fade-in">
+
+    <!-- Título -->
+  <div class="section-header" style="margin-top: 4.0rem;">
+    <div>
+      <h1><i class="fas fa-dumbbell"></i> Rutinas de Entrenamiento</h1>
+      <p>Crea y gestiona tus rutinas personalizadas.</p>
+    </div>
+    <div class="header-actions">
+      <a href="/routines/create" class="btn btn-gold">
+        <i class="fas fa-plus"></i> Nueva Rutina
+        </a>
+    </div>
+  </div>
+
+  <% if (routines && routines.length > 0) { %>
+    <!-- Filtros -->
+    <div class="filters-bar">
+      <button class="filter-btn active" data-filter="all">Todas</button>
+      <button class="filter-btn" data-filter="Fuerza">Fuerza</button>
+      <button class="filter-btn" data-filter="Cardio">Cardio</button>
+      <button class="filter-btn" data-filter="HIIT">HIIT</button>
+      <button class="filter-btn" data-filter="Funcional">Funcional</button>
+      <button class="filter-btn" data-filter="Definición">Definición</button>
+    </div>
+
+    <!-- Grid de rutinas -->
+    <div class="routines-grid" id="routinesGrid">
+      <% routines.forEach(function(r) { %>
+        <div class="routine-card <%= r.es_personal ? 'routine-personal' : 'routine-suggested' %>" data-tipo="<%= r.tipo || 'Fuerza' %>">
+          <div class="routine-card-header">
+            <div class="routine-type-badge"><%= r.tipo || 'Fuerza' %></div>
+            <% if (r.es_personal) { %>
+              <span class="badge-personal"><i class="fas fa-user"></i> Personal</span>
+            <% } else { %>
+              <span class="badge-rec"><i class="fas fa-star"></i> Recomendado</span>
+            <% } %>
+          </div>
+          <h3 class="routine-name"><%= r.nombre %></h3>
+          <p class="routine-desc"><%= r.descripcion || 'Sin descripción' %></p>
+          <div class="routine-meta">
+            <span><i class="fas fa-clock"></i> <%= r.duracion || 60 %> min</span>
+            <span><i class="fas fa-layer-group"></i> <%= r.nivel || 'Intermedio' %></span>
+            <span><i class="fas fa-list"></i> <%= r.ejercicios_count || 0 %> ejercicios</span>
+          </div>
+          <div class="routine-card-footer">
+            <a href="/routines/<%= r.id %>" class="btn btn-outline">Ver Detalles</a>
+            <button class="btn btn-primary complete-btn" data-id="<%= r.id %>">Completar</button>
+          </div>
+        </div>
+      <%}); %>
+    </div>
+  <% } else { %>
+    <!-- Estado vacío -->
+    <div class="empty-state">
+      <i class="fas fa-dumbbell"></i>
+      <h3>No tienes rutinas todavía</h3>
+      <p>Crea tu primera rutina de entrenamiento para empezar a entrenar.</p>
+      <a href="/routines/create" class="btn btn-primary"><i class="fas fa-plus"></i> Crear Rutina</a>
+    </div>
+  <% } %>
+
+</main>
+
+<style>
+.routines-section { padding: 30px 20px 60px; }
+.section-header { 
+  display: flex; justify-content: space-between; align-items: center; 
+  margin-bottom: 30px; flex-wrap: gap: 20px; 
+}
+.section-header h1 { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 2rem; }
+.section-header p { color: var(--gray-light); margin-top: 5px; }
+
+.filters-bar { 
+  display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; 
+}
+.filter-btn { 
+  padding: 10px 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  border-radius: 25px; color: var(--text-dim); cursor: pointer; transition: all 0.3s;
+}
+.filter-btn:hover, .filter-btn.active { 
+  background: var(--gold); border-color: var(--gold); color: var(--dark-bg); 
+}
+
+.routines-grid { 
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; 
+}
+.routine-card { 
+  background: var(--dark-secondary); border: 1px solid var(--border); border-radius: 16px; 
+  padding: 24px; transition: all 0.3s; 
+}
+.routine-card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 10px 40px rgba(184,153,110,0.2); }
+.routine-card[data-tipo=""] { border-color: var(--gold); }
+
+/* Estilo para rutinas personales */
+.routine-personal { border-color: rgba(212, 175, 55, 0.5); }
+.routine-personal:hover { border-color: var(--gold); }
+
+/* Estilo para rutinas sugeridas */
+.routine-suggested { border-color: rgba(255, 255, 255, 0.1); opacity: 0.9; }
+.routine-suggested:hover { border-color: rgba(255, 255, 255, 0.3); }
+
+.routine-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.routine-type-badge { 
+  background: rgba(184,153,110,0.2); color: var(--gold); padding: 5px 12px; 
+  border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; 
+}
+
+/* Badges */
+.badge-personal {
+  background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-suggested {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-dim);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.routine-actions { display: flex; gap: 8px; }
+.action-icon { 
+  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.05); border-radius: 8px; color: var(--gray); 
+  cursor: pointer; transition: all 0.2s; border: none; text-decoration: none;
+}
+.action-icon:hover { background: rgba(184,153,110,0.2); color: var(--gold); }
+.delete-btn:hover { background: rgba(220,53,69,0.2); color: #dc3545; }
+
+.routine-name { color: var(--gold-light); font-size: 1.3rem; margin-bottom: 8px; font-family: 'Playfair Display', serif; }
+.routine-desc { color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px; }
+
+.routine-meta { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+.routine-meta span { 
+  display: flex; align-items: center; gap: 6px; color: var(--text-dim); font-size: 0.85rem; 
+}
+.routine-meta i { color: var(--gold-dim); }
+
+.routine-card-footer { display: flex; gap: 10px; }
+.btn { flex: 1; padding: 12px; border-radius: 10px; text-align: center; font-weight: 600; cursor: pointer; transition: all 0.3s; text-decoration: none; display: inline-block; }
+.btn-primary { background: var(--gold); color: var(--dark-bg); border: none; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(184,153,110,0.4); }
+.btn-outline { background: transparent; border: 1px solid var(--gold-dim); color: var(--gold); }
+.btn-outline:hover { border-color: var(--gold); background: rgba(184,153,110,0.1); }
+
+.empty-state { text-align: center; padding: 60px 20px; }
+.empty-state i { font-size: 4rem; color: var(--gold-dim); margin-bottom: 20px; }
+.empty-state h3 { color: var(--gold); font-size: 1.5rem; margin-bottom: 10px; }
+.empty-state p { color: var(--text-dim); margin-bottom: 25px; }
+
+.btn { padding: 10px 20px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+</style>
+
+<script>
+// Filtrado
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.dataset.filter;
+    document.querySelectorAll('.routine-card').forEach(card => {
+      if (filter === 'all' || card.dataset.tipo === filter) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+});
+
+// Completar rutina
+document.querySelectorAll('.complete-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const id = btn.dataset.id;
+    try {
+      const res = await fetch(`/routines/${id}/complete`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        alert('¡Entrenamiento completado! <i class="fas fa-fire"></i> Racha: ' + data.racha);
+        location.reload();
+      }
+    } catch(e) { console.error(e); }
+  });
+});
+
+// Eliminar rutina
+document.querySelectorAll('.delete-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    if (!confirm('¿Eliminar esta rutina?')) return;
+    const id = btn.dataset.id;
+    try {
+      const res = await fetch(`/routines/${id}/delete`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        btn.closest('.routine-card').remove();
+      }
+    } catch(e) { console.error(e); }
+  });
+});
+</script>
+
+<%- include('partials/footer') %>

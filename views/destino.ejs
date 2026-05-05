@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Templo</title>
+    <link rel="icon" type="image/png" href="public/images/capr.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a2d9d6bd3c.js" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --gold: #b8996e;
+            --gold-light: #c9a97a;
+            --gold-dim: #8a7252;
+            --dark: #0a0e12;
+            --dark2: #12181f;
+            --text: #b8bcc4;
+            --gray: #8b92a0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #000;
+            color: var(--text);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Partículas doradas flotando */
+        .particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--gold);
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: float 18s infinite linear;
+        }
+        @keyframes float {
+            0%   { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10%  { opacity: 0.4; }
+            90%  { opacity: 0.4; }
+            100% { transform: translateY(-100px) translateX(100px); opacity: 0; }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Título principal */
+        .page-title {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 50px 20px;
+            background: linear-gradient(135deg, rgba(18,24,31,0.7), rgba(10,14,18,0.9));
+            border: 2px solid var(--gold-dim);
+            border-radius: 30px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+        }
+
+        .page-title h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 6rem;
+            font-weight: 900;
+            letter-spacing: 0.3em;
+            background: linear-gradient(180deg, #fff, var(--gold-light), var(--gold));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 50px rgba(184,153,110,0.6);
+            animation: glow 4s ease-in-out infinite alternate;
+        }
+
+        .page-title p {
+            font-size: 1.4rem;
+            color: var(--gold-light);
+            margin-top: 15px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(184,153,110,0.5)); }
+            to   { filter: drop-shadow(0 0 40px rgba(184,153,110,0.9)); }
+        }
+
+        /* Grid de tarjetas */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .devoto-card {
+            background: linear-gradient(135deg, rgba(18,24,31,0.85), rgba(10,14,18,0.95));
+            border: 1px solid var(--gold-dim);
+            border-radius: 25px;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        }
+
+        .devoto-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, transparent, rgba(184,153,110,0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.8s;
+        }
+
+        .devoto-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .devoto-card:hover {
+            transform: translateY(-20px) scale(1.03);
+            border-color: var(--gold);
+            box-shadow: 0 40px 80px rgba(184,153,110,0.4);
+        }
+
+        .card-header {
+            height: 140px;
+            background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #000;
+            border: 4px solid #fff solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--gold);
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--gold-light);
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .label {
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.8rem;
+        }
+
+        .value {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(74,222,128,0.15);
+            color: #4ade80;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(184,153,110,0.2);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .btn-edit {
+            background: rgba(184,153,110,0.2);
+            color: var(--gold);
+        }
+
+        .btn-edit:hover {
+            background: var(--gold);
+            color: #000;
+            transform: scale(1.1);
+        }
+
+        .btn-delete {
+    background: linear-gradient(135deg, rgba(60,0,0,0.6), rgba(120,0,0,0.4));
+    color: #ff6b6b;
+    border: 1px solid rgba(255,80,80,0.4);
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.4s ease;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 12px rgba(255,60,60,0.2);
+}
+
+.btn-delete:hover {
+    background: rgba(255,60,60,0.8);
+    color: #000;
+    border-color: rgba(255,80,80,0.8);
+    transform: scale(1.08);
+    box-shadow: 0 0 25px rgba(255,60,60,0.5);
+}
+
+.btn-delete:active {
+    transform: scale(0.96);
+    box-shadow: 0 0 8px rgba(255,60,60,0.3);
+}
+
+        .btn-volver-dashboard {
+    display: inline-block;
+    padding: 12px 25px;
+    margin-bottom: 30px;
+    background: rgba(184,153,110,0.2);
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-volver-dashboard:hover {
+    background: var(--gold);
+    color: #000;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 5px 15px rgba(184,153,110,0.4);
+}
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-title h1 { font-size: 4rem; letter-spacing: 0.2em; }
+            .results-grid { grid-template-columns: 1fr; }
+            .card-header { height: 120px; }
+            .avatar { width: 80px; height: 80px; font-size: 2.5rem; }
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <a href="/dashboard" class="btn-volver-dashboard">
+        <i class="fas fa-arrow-left"></i> Dashboard
+    </a>    
+
+    <div class="particles" id="particles"></div>
+    <div class="container">
+
+        <div class="page-title">
+            <h1>MI TEMPLO</h1>
+            <p>creados por mi</p>
+        </div>
+       
+        <div class="results-grid">
+
+            <% // Mostrar Rutinas %>
+            <% if (rutinas.length > 0) { %>
+                <% rutinas.forEach(routine => { %>
+                    <div class="devoto-card">
+                        <div class="card-header">
+                            <div class="avatar">
+                                <i class="fas fa-dumbbell"></i>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h2 class="name"><%= routine.nombre %></h2>
+                            <p style="text-align:center; margin-bottom:18px; opacity:.8;">
+                                <%= routine.descripcion || 'Rutina de entrenamiento' %>
+                            </p>
+                            <div class="info">
+                                <span class="label">Tipo:</span>
+                                <span class="value"><%= routine.tipo %></span>
+                            </div>
+                            <div class="info">
+                                <span class="label">Nivel:</span>
+                                <span class="value"><%= routine.nivel %></span>
+                            </div>
+                            <div class="info">
+                                <span class="label">Duración:</span>
+                                <span class="value"><%= routine.duracion %> min</span>
+                            </div>
+                            <div class="actions">
+                                <a href="/routines/<%= routine.id %>/edit" class="btn btn-edit">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <form action="/routines/<%= routine.id %>/delete" method="POST" class="delete-form">
+                                    <button type="submit" class="btn-delete">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } %>
+
+            <% // Mostrar Hábitos %>
+            <% if (habitos && habitos.length > 0) { %>
+                <% habitos.forEach(habito => { %>
+                    <div class="devoto-card">
+                        <div class="card-header" style="background: linear-gradient(135deg, <%= habito.color_hex || '#b8996e' %>, <%= habito.color_hex || '#8a7252' %>);">
+                            <div class="avatar">
+                                <i class="fas <%= habito.icono || 'fa-heart' %>"></i>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h2 class="name"><%= habito.nombre %></h2>
+                            <p style="text-align:center; margin-bottom:18px; opacity:.8;">
+                                <%= habito.descripcion || habito.categoria || 'Hábito saludable' %>
+                            </p>
+                            <div class="info">
+                                <span class="label">Categoría:</span>
+                                <span class="value"><%= habito.categoria %></span>
+                            </div>
+                            <div class="info">
+                                <span class="label">Frecuencia:</span>
+                                <span class="value"><%= habito.frecuencia %></span>
+                            </div>
+                            <div class="info">
+                                <span class="label">Racha actual:</span>
+                                <span class="value"><%= habito.racha_actual || 0 %> días</span>
+                            </div>
+                            <div class="actions">
+                                <a href="/habits" class="btn btn-edit">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } %>
+
+            <% // Mostrar Comidas %>
+            <% if (comidas && comidas.length > 0) { %>
+                <% comidas.forEach(comida => { %>
+                    <div class="devoto-card">
+                        <div class="card-header" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
+                            <div class="avatar">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h2 class="name"><%= comida.nombre %></h2>
+                            <p style="text-align:center; margin-bottom:18px; opacity:.8;">
+                                <%= comida.descripcion || comida.tipo_comida || 'Comida personalizada' %>
+                            </p>
+                            <div class="info">
+                                <span class="label">Tipo:</span>
+                                <span class="value"><%= comida.tipo_comida %></span>
+                            </div>
+                            <div class="info">
+                                <span class="label">Calorías:</span>
+                                <span class="value"><%= comida.calorias || 0 %> kcal</span>
+                            </div>
+                            <div class="info">
+                                <span class="label">Proteínas:</span>
+                                <span class="value"><%= comida.proteinas || 0 %>g</span>
+                            </div>
+                            <div class="actions">
+                                <a href="/nutrition" class="btn btn-edit">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } %>
+
+            <% if ((!rutinas || rutinas.length === 0) && (!habitos || habitos.length === 0) && (!comidas || comidas.length === 0)) { %>
+                <p style="text-align:center; grid-column: 1/-1; opacity: 0.7;">
+                    No has creado nada todavía. ¡Empieza a construir tu templo!
+                </p>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+        
+            document.querySelectorAll(".delete-form").forEach(form => {
+                form.addEventListener("submit", async (e) => {
+                    e.preventDefault(); 
+        
+                    if (!confirm("¿Seguro que deseas eliminar esta rutina?")) {
+                        return;
+                    }
+        
+                    const response = await fetch(form.action, {
+                        method: "POST"
+                    });
+        
+                    const data = await response.json();
+        
+                    if (data.success) {
+                        location.reload();   // Recargar sin redirigir
+                    } else {
+                        alert("Error al eliminar la rutina.");
+                    }
+                });
+            });
+        });
+        </script>            
+
+</body>  
+
+</html>

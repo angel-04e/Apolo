@@ -1,0 +1,378 @@
+<%- include('partials/header', { 
+    title: 'Nutrición', 
+    description: 'Planifica tu alimentación y alcanza tus objetivos con inteligencia.' 
+  }) %>
+
+<main class="container nutrition-section fade-in">
+
+  <!-- Encabezado -->
+  <div class="section-header">
+    <div>
+      <h1><i class="fas fa-leaf"></i> Plan Nutricional</h1>
+      <p>Encuentra el equilibrio entre energía, salud y bienestar.</p>
+    </div>
+    <div class="header-actions">
+      <a href="/nutrition/create" class="btn btn-gold">
+        <i class="fas fa-plus"></i> Nueva Comida
+        </a>
+    </div>
+  </div>
+
+  <!-- Resumen diario (solo si está logueado) -->
+  <section class="nutrition-summary mb-4">
+    <div class="block-header">
+      <h2>Resumen de Hoy</h2>
+      <button id="openPlanBtn" class="btn btn-outline btn-sm"><i class="fas fa-sliders"></i> Ajustar objetivos</button>
+    </div>
+
+    <div class="macros-grid">
+      <!-- Calorías (barra principal) -->
+      <div class="macro-main card">
+        <div class="macro-header">
+          <span>Calorías</span>
+          <strong><%= Math.round(resumen.calorias) %> / <%= plan.calorias_objetivo %> kcal</strong>
+        </div>
+        <div class="macro-bar">
+          <div class="macro-fill" style="width:<%= Math.min(100, Math.round((resumen.calorias/plan.calorias_objetivo)*100)) %>%"></div>
+        </div>
+        <small><%= Math.round((resumen.calorias/plan.calorias_objetivo)*100) %>% del objetivo diario</small>
+      </div>
+
+      <!-- Macros -->
+      <div class="macro-card card">
+        <i class="fas fa-drumstick-bite macro-icon" style="color:#c9a97a"></i>
+        <span class="macro-label">Proteína</span>
+        <span class="macro-val"><%= Math.round(resumen.proteina) %>g</span>
+        <small>/ <%= plan.proteina_g_objetivo %>g</small>
+      </div>
+      <div class="macro-card card">
+        <i class="fas fa-bread-slice macro-icon" style="color:#8a7252"></i>
+        <span class="macro-label">Carbos</span>
+        <span class="macro-val"><%= Math.round(resumen.carbs) %>g</span>
+        <small>/ <%= plan.carbohidratos_g_objetivo %>g</small>
+      </div>
+      <div class="macro-card card">
+        <i class="fas fa-droplet macro-icon" style="color:#b8996e"></i>
+        <span class="macro-label">Grasas</span>
+        <span class="macro-val"><%= Math.round(resumen.grasas) %>g</span>
+        <small>/ <%= plan.grasas_g_objetivo %>g</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comidas de hoy (del catálogo) -->
+  <% if (comidasHoy.length) { %>
+  <section class="card mb-4">
+    <div class="block-header">
+      <h2><i class="fas fa-utensils"></i> Comidas de Hoy</h2>
+    </div>
+    <table class="food-log-table">
+      <thead>
+        <tr><th>Alimento</th><th>Tipo</th><th>Kcal</th><th>Proteína</th><th>Porción</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% comidasHoy.forEach(c => { %>
+          <tr>
+            <td><strong><%= c.nombre %></strong></td>
+            <td><span class="badge-small"><%= c.tipo_comida %></span></td>
+            <td><%= Math.round(c.calorias * c.porcion) %></td>
+            <td><%= (c.proteina_g * c.porcion).toFixed(1) %>g</td>
+            <td><%= c.porcion %>x</td>
+            <td>
+              <button class="btn-icon remove-food" data-id="<%= c.id %>" title="Eliminar">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </section>
+  <% } %>
+
+  <!-- Mis Comidas Personalizadas -->
+  <% if (comidasPersonalizadas && comidasPersonalizadas.length > 0) { %>
+  <section class="card mb-4">
+    <div class="block-header">
+      <h2><i class="fas fa-user-heart"></i> Mis Comidas Personalizadas</h2>
+      <a href="/nutrition/create" class="btn btn-sm btn-outline">
+        <i class="fas fa-plus"></i> Nueva Comida
+      </a>
+    </div>
+    <p class="text-muted mb-3">Tus recetas y comidas creadas</p>
+    <div class="grid grid-3" id="custom-meals-grid">
+      <% comidasPersonalizadas.forEach(m => { %>
+        <div class="card card-hover meal-card custom-meal-card" data-tipo="<%= m.tipo_comida %>">
+          <div class="meal-placeholder custom-meal-icon">
+            <i class="fas fa-utensils"></i>
+          </div>
+          <div class="card-body">
+            <div class="meal-meta">
+              <span class="badge-small meal-type"><%= m.tipo_comida %></span>
+              <span class="badge-custom">Personal</span>
+            </div>
+            <h3 class="card-title"><%= m.nombre %></h3>
+            <p class="card-text"><%= m.descripcion || '' %></p>
+            <div class="meal-macros">
+              <span><i class="fas fa-fire"></i> <%= m.calorias %> kcal</span>
+              <span><i class="fas fa-drumstick-bite"></i> <%= m.proteina_g %>g prot</span>
+            </div>
+            <% if (m.objetivo) { %>
+              <div class="meal-objetivo"><%= m.objetivo %></div>
+            <% } %>
+            <div class="card-actions mt-2">
+              <button class="btn btn-primary btn-sm add-meal-btn" data-id="<%= m.id %>" data-nombre="<%= m.nombre %>">
+                <i class="fas fa-plus"></i> Añadir al plan
+              </button>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+  <% } else { %>
+  <!-- Sección para crear primera comida personalizada -->
+  <section class="card mb-4">
+    <div class="block-header">
+      <h2><i class="fas fa-user-heart"></i> Mis Comidas Personalizadas</h2>
+    </div>
+    <div class="empty-state">
+      <i class="fas fa-utensils"></i>
+      <p>No tienes comidas personalizadas aún.</p>
+      <a href="/nutrition/create" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Crear mi primera comida
+      </a>
+    </div>
+  </section>
+  <% } %>
+
+  <!-- Recomendaciones -->
+  <section class="recommendations-block">
+    <div class="block-header">
+      <h2><i class="fas fa-star"></i> Recomendaciones de Comidas</h2>
+      <% if (user && user.objetivo) { %>
+        <span class="objetivo-tag"><%= user.objetivo %></span>
+      <% } %>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-bar mb-3">
+      <select id="meal-type-filter" class="form-control filter-select">
+        <option value="">Todos los tipos</option>
+        <option value="Desayuno">Desayuno</option>
+        <option value="Almuerzo">Almuerzo</option>
+        <option value="Cena">Cena</option>
+        <option value="Snack">Snack</option>
+        <option value="Pre-entrenamiento">Pre-entrenamiento</option>
+        <option value="Post-entrenamiento">Post-entrenamiento</option>
+      </select>
+    </div>
+
+    <!-- Grid de comidas -->
+    <div class="grid grid-3" id="meals-grid">
+      <% recomendaciones.forEach(m => { %>
+        <div class="card card-hover meal-card" data-tipo="<%= m.tipo_comida %>">
+          <div class="meal-placeholder">
+            <i class="fas fa-utensils"></i>
+          </div>
+          <div class="card-body">
+            <div class="meal-meta">
+              <span class="badge-small meal-type"><%= m.tipo_comida %></span>
+              <% if (m.recomendado) { %><span class="badge-rec"><i class="fas fa-star"></i> Recomendado</span><% } %>
+            </div>
+            <h3 class="card-title"><%= m.nombre %></h3>
+            <p class="card-text"><%= m.descripcion || '' %></p>
+            <div class="meal-macros">
+              <span><i class="fas fa-fire"></i> <%= m.calorias %> kcal</span>
+              <span><i class="fas fa-drumstick-bite"></i> <%= m.proteina_g %>g prot</span>
+            </div>
+            <% if (m.objetivo) { %>
+              <div class="meal-objetivo"><%= m.objetivo %></div>
+            <% } %>
+            <div class="card-actions mt-2">
+              <button class="btn btn-primary btn-sm add-meal-btn" data-id="<%= m.id %>" data-nombre="<%= m.nombre %>">
+                <i class="fas fa-plus"></i> Añadir al plan
+              </button>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <% if (!recomendaciones.length) { %>
+      <div class="empty-state">
+        <p>No hay comidas en el catálogo aún. El administrador puede añadir comidas desde el panel.</p>
+      </div>
+    <% } %>
+  </section>
+
+</main>
+
+<!-- Modal: Ajustar objetivos nutricionales -->
+<div id="planModal" class="modal hidden">
+  <div class="modal-overlay" id="closePlanOverlay"></div>
+  <div class="modal-content modal-sm">
+    <div class="modal-header">
+      <h2>Objetivos Nutricionales</h2>
+      <button id="closePlanBtn" class="modal-close"><i class="fas fa-times"></i></button>
+    </div>
+    <form id="planForm" class="form-grid" style="grid-template-columns:1fr">
+      <label>
+        Calorías diarias (kcal)
+        <input type="number" name="calorias_objetivo" min="500" max="5000" value="<%= plan.calorias_objetivo %>" required />
+      </label>
+      <label>
+        Proteína (g)
+        <input type="number" name="proteina_g_objetivo" min="30" max="400" step="0.1" value="<%= plan.proteina_g_objetivo %>" />
+      </label>
+      <label>
+        Carbohidratos (g)
+        <input type="number" name="carbohidratos_g_objetivo" min="50" max="600" step="0.1" value="<%= plan.carbohidratos_g_objetivo %>" />
+      </label>
+      <label>
+        Grasas (g)
+        <input type="number" name="grasas_g_objetivo" min="20" max="200" step="0.1" value="<%= plan.grasas_g_objetivo %>" />
+      </label>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" id="cancelPlanBtn" class="btn btn-outline">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .nutrition-section { padding-bottom: 60px; }
+
+  .macros-grid { display: grid; grid-template-columns: 1fr repeat(3, auto); gap: 16px; align-items: start; }
+  @media (max-width: 800px) { .macros-grid { grid-template-columns: 1fr; } }
+
+  .macro-main { padding: 20px; }
+  .macro-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; color: #b8bcc4; }
+  .macro-header strong { color: #c9a97a; }
+  .macro-bar { height: 10px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; margin-bottom: 8px; }
+  .macro-fill { height: 100%; background: linear-gradient(90deg, #8a7252, #b8996e, #c9a97a); border-radius: 10px; transition: width 0.5s ease; }
+  .macro-main small { color: #6b7280; font-size: 0.78rem; }
+
+  .macro-card { padding: 16px; text-align: center; min-width: 110px; }
+  .macro-icon { font-size: 1.4rem; margin-bottom: 6px; display: block; }
+  .macro-label { display: block; font-size: 0.78rem; color: #6b7280; margin-bottom: 4px; }
+  .macro-val { display: block; font-size: 1.4rem; font-weight: 700; color: #c9a97a; }
+  .macro-card small { color: #6b7280; font-size: 0.75rem; }
+
+  .food-log-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .food-log-table th { color: #6b7280; font-weight: 500; text-align: left; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .food-log-table td { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); color: #b8bcc4; }
+  .food-log-table strong { color: #c9a97a; }
+  .badge-small { background: rgba(184,153,110,0.12); color: #8a7252; border-radius: 4px; padding: 2px 8px; font-size: 0.72rem; }
+  .badge-rec { background: rgba(255,193,7,0.1); color: #ffc107; border-radius: 4px; padding: 2px 8px; font-size: 0.72rem; }
+
+  .btn-icon { background: none; border: none; color: #6b7280; cursor: pointer; padding: 4px 8px; }
+  .btn-icon:hover { color: #e74c3c; }
+
+  .objetivo-tag { background: rgba(184,153,110,0.15); color: #b8996e; border-radius: 20px; padding: 3px 12px; font-size: 0.8rem; }
+
+  .meal-card { overflow: hidden; }
+  .meal-placeholder { background: rgba(184,153,110,0.06); height: 100px; display: flex; align-items: center; justify-content: center; }
+  .meal-placeholder i { font-size: 2rem; color: #8a7252; opacity: 0.5; }
+  .meal-img { width: 100%; height: 130px; object-fit: cover; }
+  .card-body { padding: 16px; }
+  .meal-meta { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+  .card-title { font-size: 0.95rem; color: #c9a97a; margin-bottom: 4px; }
+  .card-text { font-size: 0.82rem; color: #6b7280; margin-bottom: 8px; line-height: 1.4; }
+  .meal-macros { display: flex; gap: 12px; font-size: 0.8rem; color: #8b92a0; margin-bottom: 6px; }
+  .meal-macros i { color: #b8996e; margin-right: 3px; }
+  .meal-objetivo { font-size: 0.75rem; color: #6b7280; font-style: italic; margin-bottom: 6px; }
+
+  /* Modal */
+  .modal { position: fixed; inset: 0; z-index: 9000; display: flex; align-items: center; justify-content: center; }
+  .modal.hidden { display: none; }
+  .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); }
+  .modal-content { position: relative; z-index: 1; background: #12181f; border: 1px solid rgba(184,153,110,0.3);
+    border-radius: 16px; padding: 32px; width: 100%; max-width: 400px; }
+  .modal-sm { max-width: 380px; }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .modal-header h2 { color: #c9a97a; font-size: 1.1rem; }
+  .modal-close { background: none; border: none; color: #6b7280; font-size: 1.1rem; cursor: pointer; }
+  .form-grid { display: flex; flex-direction: column; gap: 14px; }
+  .form-grid label { display: flex; flex-direction: column; gap: 5px; font-size: 0.83rem; color: #8b92a0; }
+  .form-grid input { background: rgba(255,255,255,0.05); border: 1px solid rgba(184,153,110,0.25);
+    border-radius: 8px; padding: 10px 12px; color: #b8bcc4; font-size: 0.88rem; }
+  .form-grid input:focus { outline: none; border-color: #b8996e; }
+  .modal-actions { display: flex; gap: 10px; }
+  .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+  .mb-3 { margin-bottom: 1.5rem; }
+  .mb-4 { margin-bottom: 2rem; }
+  .mt-2 { margin-top: 1rem; }
+</style>
+
+<script>
+  /* ─── Filtro por tipo de comida ─── */
+  const filter = document.getElementById('meal-type-filter');
+  filter?.addEventListener('change', () => {
+    const val = filter.value;
+    document.querySelectorAll('.meal-card').forEach(card => {
+      card.style.display = (!val || card.dataset.tipo === val) ? '' : 'none';
+    });
+  });
+
+  /* ─── Añadir comida al plan ─── */
+  document.querySelectorAll('.add-meal-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      try {
+        const res = await fetch('/nutrition/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ comida_id: id, porcion: 1 })
+        });
+        const json = await res.json();
+        if (json.success) {
+          btn.innerHTML = '<i class="fas fa-check"></i> ¡Añadido!';
+          btn.classList.replace('btn-primary', 'btn-outline');
+          // Recargar para actualizar resumen
+          setTimeout(() => location.reload(), 800);
+        } else { btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus"></i> Añadir al plan'; }
+      } catch { btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus"></i> Añadir al plan'; }
+    });
+  });
+
+  /* ─── Eliminar comida del día ─── */
+  document.querySelectorAll('.remove-food').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('¿Eliminar este alimento del día de hoy?')) return;
+      const id = btn.dataset.id;
+      try {
+        await fetch(`/nutrition/remove/${id}`, { method: 'DELETE' });
+        location.reload();
+      } catch { alert('Error'); }
+    });
+  });
+
+  /* ─── Modal: Plan nutricional ─── */
+  document.getElementById('openPlanBtn')?.addEventListener('click', () => document.getElementById('planModal').classList.remove('hidden'));
+  document.getElementById('closePlanBtn')?.addEventListener('click', () => document.getElementById('planModal').classList.add('hidden'));
+  document.getElementById('cancelPlanBtn')?.addEventListener('click', () => document.getElementById('planModal').classList.add('hidden'));
+  document.getElementById('closePlanOverlay')?.addEventListener('click', () => document.getElementById('planModal').classList.add('hidden'));
+
+  document.getElementById('planForm')?.addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = e.target.querySelector('[type=submit]');
+    btn.disabled = true;
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    try {
+      const res = await fetch('/nutrition/plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+      if (json.success) { document.getElementById('planModal').classList.add('hidden'); location.reload(); }
+      else alert('Error');
+    } catch { alert('Error de red'); }
+    btn.disabled = false;
+  });
+</script>
+
+<%- include('partials/footer') %>

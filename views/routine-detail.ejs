@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= routine.nombre %> | Apolo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a2d9d6bd3c.js" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --color-dark-bg: #0a0e12;
+            --color-dark-secondary: #12181f;
+            --color-gold: #b8996e;
+            --color-gold-light: #c9a97a;
+            --color-gold-dim: #8a7252;
+            --color-light-text: #b8bcc4;
+            --color-gray: #6b7280;
+            --color-gray-light: #8b92a0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #000000;
+            color: var(--color-light-text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(184, 153, 110, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(184, 153, 110, 0.05) 0%, transparent 40%),
+                linear-gradient(135deg, rgba(10, 14, 18, 0.98), rgba(18, 24, 31, 0.95));
+            padding: 30px 50px;
+        }
+        
+        /* HEADER */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 25px 30px;
+            background: rgba(18, 24, 31, 0.6);
+            border: 1px solid var(--color-gold-dim);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            animation: slideDown 0.6s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, rgba(184, 153, 110, 0.2), rgba(184, 153, 110, 0.1));
+            border: 1px solid var(--color-gold-dim);
+            border-radius: 12px;
+            color: var(--color-gold);
+            text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background: linear-gradient(135deg, rgba(184, 153, 110, 0.3), rgba(184, 153, 110, 0.2));
+            border-color: var(--color-gold);
+            transform: translateX(-5px);
+            box-shadow: 0 5px 20px rgba(184, 153, 110, 0.3);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn-edit, .btn-delete {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .btn-edit {
+            background: linear-gradient(135deg, var(--color-gold-dim), var(--color-gold));
+            border: none;
+            color: #000;
+        }
+        
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(184, 153, 110, 0.4);
+        }
+        
+        .btn-delete {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.5);
+            color: #ef4444;
+        }
+        
+        .btn-delete:hover {
+            background: rgba(220, 38, 38, 0.2);
+            border-color: #ef4444;
+        }
+        
+        /* ROUTINE INFO */
+        .routine-info {
+            background: linear-gradient(135deg, rgba(18, 24, 31, 0.7), rgba(10, 14, 18, 0.9));
+            border: 1px solid var(--color-gold-dim);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            animation: fadeInUp 0.6s ease 0.2s both;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .routine-header-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .routine-icon-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            background: rgba(184, 153, 110, 0.2);
+            border: 2px solid var(--color-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--color-gold);
+            box-shadow: 0 10px 30px rgba(184, 153, 110, 0.3);
+        }
+        
+        .routine-details {
+            flex: 1;
+        }
+        
+        .routine-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(184, 153, 110, 0.2);
+            border: 1px solid var(--color-gold-dim);
+            border-radius: 10px;
+            color: var(--color-gold);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        
+        .routine-title-large {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--color-gold-light);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .routine-description-full {
+            color: var(--color-gray-light);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+        
+        .routine-stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-box {
+            background: rgba(18, 24, 31, 0.6);
+            border: 1px solid var(--color-gold-dim);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-box:hover {
+            border-color: var(--color-gold);
+            transform: translateY(-3px);
+        }
+        
+        .stat-icon {
+            font-size: 2rem;
+            color: var(--color-gold);
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--color-gold-light);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--color-gray-light);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        /* EJERCICIOS SECTION */
+        .ejercicios-section {
+            animation: fadeInUp 0.6s ease 0.4s both;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--color-gold);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn-add-exercise {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--color-gold-dim), var(--color-gold));
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        
+        .btn-add-exercise:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(184, 153, 110, 0.5);
+        }
+        
+        /* EXERCISE CARDS */
+        .ejercicios-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .exercise-card {
+            background: linear-gradient(135deg, rgba(18, 24, 31, 0.7), rgba(10, 14, 18, 0.9));
+            border: 1px solid var(--color-gold-dim);
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .exercise-card:hover {
+            border-color: var(--color-gold);
+            box-shadow: 0 10px 30px rgba(184, 153, 110, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .exercise-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(184, 153, 110, 0.2);
+            border: 1px solid var(--color-gold-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-gold);
+        }
+        
+        .exercise-info {
+            flex: 1;
+        }
+        
+        .exercise-name {
+            font-size: 1.2rem;
+            color: var(--color-gold-light);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .exercise-details {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .exercise-detail {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--color-gray-light);
+            font-size: 0.9rem;
+        }
+        
+        .exercise-detail i {
+            color: var(--color-gold-dim);
+        }
+        
+        .exercise-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--color-gold-dim);
+            background: rgba(18, 24, 31, 0.6);
+            color: var(--color-gold);
+        }
+        
+        .btn-icon:hover {
+            border-color: var(--color-gold);
+            transform: translateY(-2px);
+        }
+        
+        .btn-icon.delete:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+        
+        /* EMPTY STATE */
+        .empty-exercises {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(18, 24, 31, 0.5);
+            border: 2px dashed var(--color-gold-dim);
+            border-radius: 20px;
+        }
+        
+        .empty-exercises i {
+            font-size: 4rem;
+            color: var(--color-gold-dim);
+            margin-bottom: 20px;
+        }
+        
+        .empty-exercises h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--color-gold);
+            margin-bottom: 10px;
+        }
+        
+        .empty-exercises p {
+            color: var(--color-gray-light);
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+        
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, rgba(18, 24, 31, 0.95), rgba(10, 14, 18, 0.98));
+            border: 2px solid var(--color-gold);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            animation: modalSlide 0.3s ease;
+        }
+        
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--color-gold);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--color-gold);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            transform: rotate(90deg);
+            color: var(--color-gold-light);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            color: var(--color-gold);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(18, 24, 31, 0.6);
+            border: 1px solid var(--color-gold-dim);
+            border-radius: 10px;
+            color: var(--color-light-text);
+            font-size: 0.95rem;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-gold);
+            box-shadow: 0 0 20px rgba(184, 153, 110, 0.3);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-cancel {
+            background: rgba(184, 153, 110, 0.1);
+            border: 1px solid var(--color-gold-dim);
+            color: var(--color-gold);
+        }
+        
+        .btn-cancel:hover {
+            background: rgba(184, 153, 110, 0.2);
+        }
+        
+        .btn-save {
+            background: linear-gradient(135deg, var(--color-gold-dim), var(--color-gold));
+            border: none;
+            color: #000;
+        }
+        
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(184, 153, 110, 0.4);
+        }
+
+        .btn-save-dashboard {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.btn-save-dashboard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
+}
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .page-wrapper {
+                padding: 20px;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .routine-header-info {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .routine-title-large {
+                font-size: 2rem;
+            }
+            
+            .routine-stats-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .exercise-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .exercise-number {
+                margin: 0 auto;
+            }
+            
+            .exercise-details {
+                justify-content: center;
+            }
+            
+            .exercise-actions {
+                justify-content: center;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- HEADER -->
+        <div class="header-actions">
+            <a href="/destino?id=<%= routine.id %>" class="btn-save-dashboard">
+                <i class="fas fa-check"></i>
+                Guardar y Volver
+            </a>            
+            <a href="/routines/<%= routine.id %>/edit" class="btn-edit">
+                <i class="fas fa-edit"></i>
+                Editar
+            </a>
+            <button class="btn-delete" data-id="<%= routine.id %>" data-name="<%= routine.nombre %>" onclick="confirmDeleteRoutine(this)">
+                <i class="fas fa-trash"></i>
+                Eliminar
+            </button>
+        </div>
+        
+        <!-- INFO de la Rutina-->
+        <div class="routine-info">
+            <div class="routine-header-info">
+                <div class="routine-icon-large">
+                    <% if (routine.tipo === 'Fuerza') { %>
+                        <i class="fas fa-dumbbell"></i>
+                    <% } else if (routine.tipo === 'Cardio') { %>
+                        <i class="fas fa-running"></i>
+                    <% } else if (routine.tipo === 'HIIT') { %>
+                        <i class="fas fa-fire"></i>
+                    <% } else if (routine.tipo === 'Funcional') { %>
+                        <i class="fas fa-heartbeat"></i>
+                    <% } else { %>
+                        <i class="fas fa-spa"></i>
+                    <% } %>
+                </div>
+                <div class="routine-details">
+                    <div class="routine-badge"><%= routine.tipo %></div>
+                    <h1 class="routine-title-large"><%= routine.nombre %></h1>
+                    <p class="routine-description-full">
+                        <%= routine.descripcion || 'Sin descripción disponible' %>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="routine-stats-row">
+                <div class="stat-box">
+                    <i class="far fa-clock stat-icon"></i>
+                    <div class="stat-value"><%= routine.duracion %></div>
+                    <div class="stat-label">Minutos</div>
+                </div>
+                <div class="stat-box">
+                    <i class="fas fa-fire stat-icon"></i>
+                    <div class="stat-value"><%= routine.nivel %></div>
+                    <div class="stat-label">Nivel</div>
+                </div>
+                <div class="stat-box">
+                    <i class="fas fa-list-ol stat-icon"></i>
+                    <div class="stat-value"><%= routine.ejercicios_count %></div>
+                    <div class="stat-label">Ejercicios</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- EJERCICIOS SECTION -->
+        <div class="ejercicios-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-list"></i>
+                    Ejercicios
+                </h2>
+                <button class="btn-add-exercise" onclick="openExerciseModal()">
+                    <i class="fas fa-plus"></i>
+                    Agregar Ejercicio
+                </button>
+            </div>
+            
+<!-- Ejercicios Grid -->
+<div class="ejercicios-grid" id="ejerciciosGrid">
+    <% if (routine.ejercicios && routine.ejercicios.length > 0) { %>
+        <% routine.ejercicios.forEach((ejercicio, index) => { %>
+            <div class="exercise-card">
+                <div class="exercise-number"><%= index + 1 %></div>
+                
+                <div class="exercise-info">
+                    <h3 class="exercise-name"><%= ejercicio.nombre %></h3>
+                    <div class="exercise-details">
+                        <div class="exercise-detail">
+                            <i class="fas fa-redo"></i>
+                            <span><%= ejercicio.series %> series</span>
+                        </div>
+                        <div class="exercise-detail">
+                            <i class="fas fa-list-ol"></i>
+                            <span><%= ejercicio.repeticiones %> reps</span>
+                        </div>
+                        <div class="exercise-detail">
+                            <i class="far fa-clock"></i>
+                            <span><%= ejercicio.descanso %> seg</span>
+                        </div>
+                        <% if (ejercicio.notas) { %>
+                            <div class="exercise-detail">
+                                <i class="fas fa-sticky-note"></i>
+                                <span><%= ejercicio.notas %></span>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+                
+                <div class="exercise-actions">
+                    <button class="btn-icon" 
+                            data-id="<%= ejercicio.id %>" 
+                            data-nombre="<%= ejercicio.nombre %>" 
+                            data-series="<%= ejercicio.series %>" 
+                            data-repeticiones="<%= ejercicio.repeticiones %>" 
+                            data-descanso="<%= ejercicio.descanso %>" 
+                            data-notas="<%= ejercicio.notas || '' %>"
+                            onclick="editExercise(this)">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon delete" 
+                            data-id="<%= ejercicio.id %>" 
+                            data-nombre="<%= ejercicio.nombre %>"
+                            onclick="confirmDeleteExercise(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+
+            </div>
+        <% }); %>
+    <% } else { %>
+        <div class="empty-exercises">
+            <i class="fas fa-dumbbell"></i>
+            <h3>No hay ejercicios todavía</h3>
+            <p>Comienza agregando ejercicios a tu rutina</p>
+            <button class="btn-add-exercise" onclick="openExerciseModal()">
+                <i class="fas fa-plus"></i>
+                Agregar Primer Ejercicio
+            </button>
+        </div>
+    <% } %>
+</div>
+    
+    <!-- AGREGAR/EDITAR EJERCICIO -->
+    <div class="modal" id="exerciseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Agregar Ejercicio</h3>
+                <button class="modal-close" onclick="closeExerciseModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="exerciseForm" action="/routines/<%= routine.id %>/exercises" method="POST">
+                <input type="hidden" name="id" id="exerciseId">
+                
+                <div class="form-group">
+                    <label class="form-label">Nombre del Ejercicio</label>
+                    <input type="text" name="nombre" id="exerciseNombre" class="form-input" placeholder="Ej: Press de Banca" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Series</label>
+                        <input type="number" name="series" id="exerciseSeries" class="form-input" placeholder="0" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Reps</label>
+                        <input type="number" name="repeticiones" id="exerciseReps" class="form-input" placeholder="0" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Descanso (seg)</label>
+                        <input type="number" name="descanso" id="exerciseDescanso" class="form-input" placeholder="0" min="0" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Notas (opcional)</label>
+                    <input type="text" name="notas" id="exerciseNotas" class="form-input" placeholder="Tempo, técnica, variaciones...">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeExerciseModal()">Cancelar</button>
+                    <button type="submit" class="btn-save" id="saveButton">Guardar Ejercicio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- MODAL ELIMINAR RUTINA -->
+    <div class="modal" id="deleteRoutineModal">
+        <div class="modal-content">
+            <h3 class="modal-title">¿Eliminar rutina?</h3>
+            <p style="color: var(--color-light-text); margin: 20px 0;">
+                ¿Estás seguro de que deseas eliminar "<span id="routineNameDelete"></span>"? Esta acción no se puede deshacer.
+            </p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeDeleteRoutineModal()">Cancelar</button>
+                <form id="deleteRoutineForm" method="POST" style="flex: 1;">
+                    <button type="submit" style="width: 100%; padding: 12px; background: #ef4444; border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer;">
+                        Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL ELIMINAR EJERCICIO -->
+<div class="modal" id="deleteExerciseModal">
+    <div class="modal-content">
+        <h3 class="modal-title">¿Eliminar ejercicio?</h3>
+        <p style="color: var(--color-light-text); margin: 20px 0;">
+            ¿Estás seguro de que deseas eliminar "<span id="exerciseNameDelete"></span>"? Esta acción no se puede deshacer.
+        </p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeDeleteExerciseModal()">Cancelar</button>
+            <form id="deleteExerciseForm" method="POST" style="flex: 1;">
+                <button type="submit" style="width: 100%; padding: 12px; background: #ef4444; border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer;">
+                    Eliminar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Modal de ejercicios
+    function openExerciseModal() {
+        document.getElementById('modalTitle').textContent = 'Agregar Ejercicio';
+        document.getElementById('exerciseForm').action = '/routines/<%= routine.id %>/exercises';
+        document.getElementById('exerciseForm').reset();
+        document.getElementById('exerciseModal').classList.add('active');
+    }
+    
+    function closeExerciseModal() {
+        document.getElementById('exerciseModal').classList.remove('active');
+        document.getElementById('exerciseForm').reset();
+    }
+    
+    // Editar ejercicio 
+    function editExercise(button) {
+        const id = button.getAttribute('data-id');
+        const nombre = button.getAttribute('data-nombre');
+        const series = button.getAttribute('data-series');
+        const repeticiones = button.getAttribute('data-repeticiones');
+        const descanso = button.getAttribute('data-descanso');
+        const notas = button.getAttribute('data-notas');
+        
+        // Cambiar el título del modal
+        document.getElementById('modalTitle').textContent = 'Editar Ejercicio';
+        
+        // Cambiar la acción del formulario
+        const form = document.getElementById('exerciseForm');
+        form.action = `/routines/<%= routine.id %>/exercises/${id}/edit`;
+        
+        // Rellenar los campos
+        form.querySelector('[name="nombre"]').value = nombre;
+        form.querySelector('[name="series"]').value = series;
+        form.querySelector('[name="repeticiones"]').value = repeticiones;
+        form.querySelector('[name="descanso"]').value = descanso;
+        form.querySelector('[name="notas"]').value = notas || '';
+        
+        openExerciseModal();
+    }
+    
+    // Modal eliminar rutina
+    function confirmDeleteRoutine(button) {
+        const id = button.getAttribute('data-id');
+        const name = button.getAttribute('data-name');
+        
+        document.getElementById('routineNameDelete').textContent = name;
+        document.getElementById('deleteRoutineForm').action = `/routines/${id}/delete`;
+        document.getElementById('deleteRoutineModal').classList.add('active');
+    }
+    
+    function closeDeleteRoutineModal() {
+        document.getElementById('deleteRoutineModal').classList.remove('active');
+    }
+    
+    // Eliminar ejercicio 
+    function confirmDeleteExercise(button) {
+        const id = button.getAttribute('data-id');
+        const nombre = button.getAttribute('data-nombre');
+        
+        document.getElementById('exerciseNameDelete').textContent = nombre;
+        document.getElementById('deleteExerciseForm').action = `/routines/<%= routine.id %>/exercises/${id}/delete`;
+        document.getElementById('deleteExerciseModal').classList.add('active');
+    }
+    
+    function closeDeleteExerciseModal() {
+        document.getElementById('deleteExerciseModal').classList.remove('active');
+    }
+    
+    // Cerrar modales al hacer clic fuera
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+    });
+</script>
+</body>
+</html>
